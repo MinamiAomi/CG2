@@ -4,7 +4,7 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <cassert>
-#include "MyString.h"
+#include "StringUtils.h"
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
