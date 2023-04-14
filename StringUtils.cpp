@@ -1,4 +1,4 @@
-#include "MyString.h"
+#include "StringUtils.h"
 #include <Windows.h>
 
 void Log(const char* str) {
