@@ -1,16 +1,12 @@
-#include "MyString.h"
+#include "StringUtils.h"
 #include <Windows.h>
-
-void Log(const char* str) {
-	OutputDebugStringA(str);
-}
 
 void Log(const std::string& str) {
 	OutputDebugStringA(str.c_str());
 }
 
 void Log(const std::wstring& str) {
-	Log(ConvertString(str));
+	OutputDebugStringW(str.c_str());
 }
 
 std::wstring ConvertString(const std::string& str) {
