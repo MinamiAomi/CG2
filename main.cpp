@@ -6,6 +6,7 @@
 #include <cassert>
 #include "StringUtils.h"
 #include "MathUtils.h"
+#include "StringUtils.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
