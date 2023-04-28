@@ -2,7 +2,6 @@
 #include <string>
 #include <format>
 
-void Log(const char* str);
 void Log(const std::string& str);
 void Log(const std::wstring& str);
 // wstringに変換

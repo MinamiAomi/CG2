@@ -44,6 +44,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 出力ウィンドウに文字出力
 	Log("Hello,DirectX!\n");
 
+	char str[] = "STRING";
+	wchar_t wstr[] = L"STRING";
+
 	// クライアント領域サイズ
 	const uint32_t kClientWidth = 1280;
 	const uint32_t kClientHeight = 720;

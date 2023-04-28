@@ -1,9 +1,6 @@
 #include "StringUtils.h"
 #include <Windows.h>
 
-void Log(const char* str) {
-	OutputDebugStringA(str);
-}
 
 void Log(const std::string& str) {
 	OutputDebugStringA(str.c_str());
