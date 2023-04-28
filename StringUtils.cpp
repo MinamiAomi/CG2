@@ -7,7 +7,7 @@ void Log(const std::string& str) {
 }
 
 void Log(const std::wstring& str) {
-	Log(ConvertString(str));
+	OutputDebugStringW(str.c_str());
 }
 
 std::wstring ConvertString(const std::string& str) {
