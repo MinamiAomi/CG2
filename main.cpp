@@ -58,7 +58,7 @@ HWND g_hwnd = nullptr;
 IDXGIFactory7* g_dxgiFactory = nullptr;
 ID3D12Device* g_device = nullptr;
 ID3D12CommandQueue* g_commandQueue = nullptr;
-ID3D12CommandAllocator* g_commandAllocator = nullptr;
+ID3D12CommandAllocator* g_commandAllocators[kSwapChainBufferCount] = { nullptr };
 ID3D12GraphicsCommandList* g_commandList = nullptr;
 ID3D12Fence* g_fence = nullptr;
 uint64_t g_fenceValue = 0;
@@ -235,12 +235,18 @@ void CreateDirectXCommand() {
 	assert(SUCCEEDED(hr));
 
 	// コマンドアロケータを生成
-	hr = g_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_commandAllocator));
+	hr = g_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_commandAllocators[0]));
 	assert(SUCCEEDED(hr));
 	
-	// コマンドリストを生成
-	hr = g_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, g_commandAllocator, nullptr, IID_PPV_ARGS(&g_commandList));
+	// コマンドアロケータを生成
+	hr = g_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_commandAllocators[1]));
 	assert(SUCCEEDED(hr));
+
+	// コマンドリストを生成
+	hr = g_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, g_commandAllocators[0], nullptr, IID_PPV_ARGS(&g_commandList));
+	assert(SUCCEEDED(hr));
+
+	g_commandList->Close();
 
 	// フェンスを生成
 	hr = g_device->CreateFence(g_fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&g_fence));
@@ -414,6 +420,7 @@ void CreateTriangle() {
 void MainLoop() {
 
 	HRESULT hr = S_FALSE;
+
 	MSG msg{};
 	// ウィンドウの×ボタンがが押されるまでループ
 	while (msg.message != WM_QUIT) {
@@ -423,8 +430,15 @@ void MainLoop() {
 			DispatchMessage(&msg);
 		}
 		else {
-			// これから書き込むバックバッファインデックスを取得
-			uint32_t backBufferIndex = g_swapChain->GetCurrentBackBufferIndex();
+			uint32_t curBackBufferIndex = g_swapChain->GetCurrentBackBufferIndex();
+
+	
+			// コマンドリストを準備
+			hr = g_commandAllocators[curBackBufferIndex]->Reset();
+			assert(SUCCEEDED(hr));
+			hr = g_commandList->Reset(g_commandAllocators[curBackBufferIndex], nullptr);
+			assert(SUCCEEDED(hr));
+
 			// TransitionBarrierの設定
 			D3D12_RESOURCE_BARRIER barrier{};
 			// 今回のバリアはTransition
@@ -432,7 +446,7 @@ void MainLoop() {
 			// Noneにしておく
 			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 			// バリアを張る対象のリソース
-			barrier.Transition.pResource = g_swapChainResource[backBufferIndex];
+			barrier.Transition.pResource = g_swapChainResource[curBackBufferIndex];
 			// PresentからRenderTargeへ
 			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -440,10 +454,10 @@ void MainLoop() {
 			g_commandList->ResourceBarrier(1, &barrier);
 
 			// 描画先のRTVを設定
-			g_commandList->OMSetRenderTargets(1, &g_rtvHandle[backBufferIndex], false, nullptr);
+			g_commandList->OMSetRenderTargets(1, &g_rtvHandle[curBackBufferIndex], false, nullptr);
 			// 指定した色で画面全体をクリア
 			float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-			g_commandList->ClearRenderTargetView(g_rtvHandle[backBufferIndex], clearColor, 0, nullptr);
+			g_commandList->ClearRenderTargetView(g_rtvHandle[curBackBufferIndex], clearColor, 0, nullptr);
 
 			D3D12_VIEWPORT viewport{};
 			viewport.Width = static_cast<float>(kClientWidth);
@@ -483,16 +497,20 @@ void MainLoop() {
 			// コマンドリストの内容を確定
 			hr = g_commandList->Close();
 			assert(SUCCEEDED(hr));
+
 			// GPUにコマンドリストの実行を行わせる
 			ID3D12CommandList* commandLists[] = { g_commandList };
 			g_commandQueue->ExecuteCommandLists(1, commandLists);
+			
 			// GPUとOSに画面交換を行うよう通知する
 			g_swapChain->Present(1, 0);
+			
 			// Fenceの値を更新
 			g_fenceValue++;
 			// GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
 			hr = g_commandQueue->Signal(g_fence, g_fenceValue);
 			assert(SUCCEEDED(hr));
+			
 			// Fenceの値が指定したSignal値にたどり着いているか確認する
 			// GetCompletedValueの初期値はFence作成時に渡した初期値
 			if (g_fence->GetCompletedValue() < g_fenceValue) {
@@ -501,11 +519,6 @@ void MainLoop() {
 				// イベントを待つ
 				WaitForSingleObject(g_fenceEvent, INFINITE);
 			}
-			// 次フレーム用のコマンドリストを準備
-			hr = g_commandAllocator->Reset();
-			assert(SUCCEEDED(hr));
-			hr = g_commandList->Reset(g_commandAllocator, nullptr);
-			assert(SUCCEEDED(hr));
 		}
 	}
 }
@@ -523,7 +536,8 @@ void Release() {
 	CloseHandle(g_fenceEvent);
 	g_fence->Release();
 	g_commandList->Release();
-	g_commandAllocator->Release();
+	g_commandAllocators[0]->Release();
+	g_commandAllocators[1]->Release();
 	g_commandQueue->Release();
 	g_device->Release();
 	g_dxgiFactory->Release();
