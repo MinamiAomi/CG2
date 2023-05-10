@@ -7,12 +7,15 @@
 #include <MathUtils_inline.h>
 
 namespace Math {
-constexpr float Pi = 3.141592653589793f;
-constexpr float TwoPi = Pi * 2.0f;
-constexpr float HalfPi = Pi * 0.5f;
+	constexpr float Pi = 3.141592653589793f;
+	constexpr float TwoPi = Pi * 2.0f;
+	constexpr float HalfPi = Pi * 0.5f;
 
-constexpr inline float ToRad(float deg) { return deg * Pi / 180.0f; }
-constexpr inline float ToDeg(float rad) { return rad * 180.0f / Pi; }
+	constexpr inline float ToRad(float deg) { return deg * Pi / 180.0f; }
+	constexpr inline float ToDeg(float rad) { return rad * 180.0f / Pi; }
+
+	Vector3 Transform(const Vector3& v, const Matrix4x4& m);
+	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 } // namespace Math
 
 
@@ -68,13 +71,11 @@ inline Matrix4x4 MakeTranslateMatrix(const Vector3& trans);
 Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& trans);
 Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspect, float nearZ, float farZ);
 Matrix4x4 MakeOrthographicMatrix(
-    float left, float top, float right, float bottom, float nearZ, float farZ);
+	float left, float top, float right, float bottom, float nearZ, float farZ);
 Matrix4x4 MakeViewportMatrix(
-    float left, float top, float width, float height, float minDepth, float maxDepth);
+	float left, float top, float width, float height, float minDepth, float maxDepth);
 
 inline Vector3 GetTranslate(const Matrix4x4& m);
-Vector3 Transform(const Vector3& v, const Matrix4x4& m);
-Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 inline Vector3 operator*(const Vector3& v, const Matrix4x4& m);
 
 inline Vector2 Lerp(float t, const Vector2& s, const Vector2& e);

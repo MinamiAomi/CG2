@@ -277,7 +277,7 @@ Matrix4x4 MakeViewportMatrix(
 	    1.0f};
 }
 
-Vector3 Transform(const Vector3& v, const Matrix4x4& m) {
+Vector3 Math::Transform(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result = {};
 	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + 1.0f * m.m[3][0];
 	result.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + 1.0f * m.m[3][1];
@@ -288,7 +288,7 @@ Vector3 Transform(const Vector3& v, const Matrix4x4& m) {
 	return result;
 }
 
-Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
+Vector3 Math::TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	return {
 	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
 	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],

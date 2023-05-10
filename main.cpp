@@ -28,13 +28,19 @@ struct Transform {
 	Vector3 translate;
 };
 
+struct ConstantBuffer {
+	ID3D12Resource* resource = nullptr;
+	void* mapData = nullptr;
+	size_t sizeInByte = {};
+};
+
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	// メッセージに対してゲーム固有の処理を行う
 	switch (msg) {
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
 	}
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
@@ -76,9 +82,12 @@ ID3D12RootSignature* g_rootSignature = nullptr;
 ID3D12PipelineState* g_pipelineState = nullptr;
 ID3D12Resource* g_vertexResource = nullptr;
 D3D12_VERTEX_BUFFER_VIEW g_vertexBufferView{};
-ID3D12Resource* g_materialResource = nullptr;
-ID3D12Resource* g_wvpResource = nullptr;
 
+ConstantBuffer g_materialBuffer;
+Transform g_transform{ {1.0f,1.0f,1.0f}, {}, {} };
+ConstantBuffer g_wvpBuffer;
+
+Transform g_cameraTransform{ {1.0f,1.0f,1.0f}, {} ,{0.0f,0.0f,-5.0f} };
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 出力ウィンドウに文字出力
@@ -161,8 +170,8 @@ void InitalizeDirectX() {
 
 	// 良い順にアダプターを頼む
 	for (uint32_t i = 0;
-		 g_dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND;
-		 ++i) {
+		g_dxgiFactory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&useAdapter)) != DXGI_ERROR_NOT_FOUND;
+		++i) {
 		// アダプター情報を取得
 		DXGI_ADAPTER_DESC3 adapterDesc{};
 		hr = useAdapter->GetDesc3(&adapterDesc);
@@ -179,10 +188,10 @@ void InitalizeDirectX() {
 
 
 	// 機能レベルとログ出力用の文字列
-	D3D_FEATURE_LEVEL featureLevels[] =	{ 
-		D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0 
+	D3D_FEATURE_LEVEL featureLevels[] = {
+		D3D_FEATURE_LEVEL_12_2, D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0
 	};
-	const char* featureLevelStrings[] =	{ "12.2", "12.1", "12.0" };
+	const char* featureLevelStrings[] = { "12.2", "12.1", "12.0" };
 	// 高い順に生成できるか試していく
 	for (size_t i = 0; i < _countof(featureLevels); ++i) {
 		// 採用したアダプターデバイスを生成
@@ -237,7 +246,7 @@ void CreateDirectXCommand() {
 	// コマンドアロケータを生成
 	hr = g_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&g_commandAllocator));
 	assert(SUCCEEDED(hr));
-	
+
 	// コマンドリストを生成
 	hr = g_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, g_commandAllocator, nullptr, IID_PPV_ARGS(&g_commandList));
 	assert(SUCCEEDED(hr));
@@ -259,7 +268,7 @@ void CreateScreenRenderTarget() {
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// 色の形式
 	swapChainDesc.SampleDesc.Count = 1;					// マルチサンプル市内
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	// 描画ターゲットとして利用する
-	swapChainDesc.BufferCount = kSwapChainBufferCount;	
+	swapChainDesc.BufferCount = kSwapChainBufferCount;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;	// モニタに移したら、中身を破棄
 	// スワップチェーンを生成
 	hr = g_dxgiFactory->CreateSwapChainForHwnd(g_commandQueue, g_hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&g_swapChain));
@@ -305,7 +314,7 @@ void InitalizeDXC() {
 
 void CreatePipelineState() {
 	HRESULT hr = S_FALSE;
-		
+
 	D3D12_ROOT_PARAMETER rootParameters[2] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
@@ -341,7 +350,7 @@ void CreatePipelineState() {
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
-	
+
 	// ブレンドステート
 	D3D12_BLEND_DESC blendDesc{};
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -394,21 +403,25 @@ void CreateTriangle() {
 	Vector4* vertexData = nullptr;
 	g_vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-	vertexData[1] = {  0.0f,  0.5f, 0.0f, 1.0f };
-	vertexData[2] = {  0.5f, -0.5f, 0.0f, 1.0f };
+	vertexData[1] = { 0.0f,  0.5f, 0.0f, 1.0f };
+	vertexData[2] = { 0.5f, -0.5f, 0.0f, 1.0f };
 	g_vertexResource->Unmap(0, nullptr);
 
-	g_materialResource = CreateBufferResource(sizeof(Vector4));
-	Vector4* materialData = nullptr;
-	g_materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	*materialData = { 1.0f,1.0f,0.0f,1.0f };
-	g_materialResource->Unmap(0, nullptr);
+	g_materialBuffer.sizeInByte = sizeof(Vector4);
+	g_materialBuffer.resource = CreateBufferResource(g_materialBuffer.sizeInByte);
+	g_materialBuffer.resource->Map(0, nullptr, &g_materialBuffer.mapData);
+	Vector4 materialData{ 1.0f,1.0f,0.0f,1.0f };
+	memcpy(g_materialBuffer.mapData, &materialData, g_materialBuffer.sizeInByte);
 
-	g_wvpResource = CreateBufferResource(sizeof(Matrix4x4));
-	Matrix4x4* wvpData = nullptr;
-	g_wvpResource->Map(0,nullptr, reinterpret_cast<void**>(&wvpData));
-	*wvpData = MakeIdentityMatrix();
-	g_wvpResource->Unmap(0,nullptr);
+	g_wvpBuffer.sizeInByte = sizeof(Matrix4x4);
+	g_wvpBuffer.resource = CreateBufferResource(g_wvpBuffer.sizeInByte);
+	g_wvpBuffer.resource->Map(0, nullptr, &g_wvpBuffer.mapData);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(g_transform.scale, g_transform.rotate, g_transform.translate);
+	Matrix4x4 cameraMatrix = MakeAffineMatrix(g_cameraTransform.scale, g_cameraTransform.rotate, g_cameraTransform.translate);
+	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 wvpData = worldMatrix * viewMatrix * projectionMatrix;
+	memcpy(g_wvpBuffer.mapData, &wvpData, g_wvpBuffer.sizeInByte);
 }
 
 void MainLoop() {
@@ -462,13 +475,21 @@ void MainLoop() {
 			g_commandList->RSSetScissorRects(1, &scissorRect);
 
 			//-----------------------------------------------------------------------------------------//
-			
+
+			g_transform.rotate.y += 0.03f;
+			Matrix4x4 worldMatrix = MakeAffineMatrix(g_transform.scale, g_transform.rotate, g_transform.translate);
+			Matrix4x4 cameraMatrix = MakeAffineMatrix(g_cameraTransform.scale, g_cameraTransform.rotate, g_cameraTransform.translate);
+			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
+			Matrix4x4 wvpData = worldMatrix * viewMatrix * projectionMatrix;
+			memcpy(g_wvpBuffer.mapData, &wvpData, g_wvpBuffer.sizeInByte);
+
 			g_commandList->SetGraphicsRootSignature(g_rootSignature);
 			g_commandList->SetPipelineState(g_pipelineState);
 			g_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			g_commandList->IASetVertexBuffers(0, 1, &g_vertexBufferView);
-			g_commandList->SetGraphicsRootConstantBufferView(0, g_materialResource->GetGPUVirtualAddress());
-			g_commandList->SetGraphicsRootConstantBufferView(1, g_wvpResource->GetGPUVirtualAddress());
+			g_commandList->SetGraphicsRootConstantBufferView(0, g_materialBuffer.resource->GetGPUVirtualAddress());
+			g_commandList->SetGraphicsRootConstantBufferView(1, g_wvpBuffer.resource->GetGPUVirtualAddress());
 			g_commandList->DrawInstanced(3, 1, 0, 0);
 
 			//-----------------------------------------------------------------------------------------//
@@ -511,8 +532,8 @@ void MainLoop() {
 }
 
 void Release() {
-	g_wvpResource->Release();
-	g_materialResource->Release();
+	g_wvpBuffer.resource->Release();
+	g_materialBuffer.resource->Release();
 	g_vertexResource->Release();
 	g_pipelineState->Release();
 	g_rootSignature->Release();
