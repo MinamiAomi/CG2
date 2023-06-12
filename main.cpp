@@ -1,9 +1,16 @@
 #include <Windows.h>
-#include <cstdint>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
+#include <dxcapi.h>
+
+#include <cstdint>
 #include <cassert>
+
+#include "Externals/ImGui/imgui.h"
+#include "Externals/ImGui/imgui_impl_dx12.h"
+#include "Externals/ImGui/imgui_impl_win32.h"
+
 #include "StringUtils.h"
 #include "MathUtils.h"
 #include "StringUtils.h"
@@ -11,10 +18,9 @@
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
-
-#include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // 定数
 constexpr uint32_t kSwapChainBufferCount = 2;
@@ -47,6 +53,7 @@ struct ConstantBuffer : public GPUResource {
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) { return true; }
 	// メッセージに対してゲーム固有の処理を行う
 	switch (msg) {
 	case WM_DESTROY:
@@ -228,7 +235,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	IDXGISwapChain4* swapChain{ nullptr };
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	ID3D12DescriptorHeap* rtvDescriptorHeap{ nullptr };
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 	GPUResource swapChainResource[kSwapChainBufferCount]{ nullptr };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle[kSwapChainBufferCount]{};
 	{
@@ -240,7 +249,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		HRESULT hr = S_FALSE;
 		// スワップチェーンの設定
-		DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 		swapChainDesc.Width = static_cast<uint32_t>(winInfo.rcClient.right - winInfo.rcClient.left);		// 画面幅
 		swapChainDesc.Height = static_cast<uint32_t>(winInfo.rcClient.bottom - winInfo.rcClient.top);	// 画面高
 		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// 色の形式
@@ -253,16 +261,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		assert(SUCCEEDED(hr));
 
 		rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kSwapChainBufferCount, false);
+		// RTVの設定
+		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 		// SwapChainResourceの生成とRTVの生成
 		for (uint32_t i = 0; i < kSwapChainBufferCount; ++i) {
 			// SwapChainからResourceを引っ張ってくる
 			hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&swapChainResource[i].resource));
 			assert(SUCCEEDED(hr));
-			// RTVの設定
-			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
-			rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 			// ディスクリプタの先頭を取得
 			rtvHandle[i] = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			// ディスクリプタハンドルをずらす
@@ -271,6 +278,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			device->CreateRenderTargetView(swapChainResource[i].resource, &rtvDesc, rtvHandle[i]);
 			swapChainResource[i].currentState = D3D12_RESOURCE_STATE_PRESENT;
 		}
+	}
+
+	ID3D12DescriptorHeap* srvDescriptorHeap{ nullptr };
+	{
+		srvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
+	}
+	// ImGuiの初期化
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGui::StyleColorsDark();
+		ImGui_ImplWin32_Init(hwnd);
+		ImGui_ImplDX12_Init(
+			device, 
+			swapChainDesc.BufferCount, 
+			rtvDesc.Format, 
+			srvDescriptorHeap,
+			srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), 
+			srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 	}
 
 	ShaderCompiler shaderCompiler;
@@ -399,6 +425,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				DispatchMessage(&msg);
 			}
 			else {
+				ImGui_ImplWin32_NewFrame();
+				ImGui_ImplDX12_NewFrame();
+				ImGui::NewFrame();
+
 				// これから書き込むバックバッファインデックスを取得
 				uint32_t backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 				// レンダ―ターゲットに遷移
@@ -428,6 +458,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				scissorRect.bottom = kClientHeight;
 				commandList->RSSetScissorRects(1, &scissorRect);
 
+				ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap };
+				commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 				//-----------------------------------------------------------------------------------------//
 
@@ -449,6 +481,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				commandList->DrawInstanced(3, 1, 0, 0);
 
 				//-----------------------------------------------------------------------------------------//
+
+				ImGui::Begin("Window");
+				ImGui::End();
+
+				ImGui::Render();
+				ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 
 				// RenderTargetからPresentへ
 				barrier = swapChainResource[backBufferIndex].TransitionBarrier(D3D12_RESOURCE_STATE_PRESENT);
@@ -486,11 +524,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	{
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
 		wvpBuffer.resource->Release();
 		materialBuffer.resource->Release();
 		vertexBuffer.resource->Release();
 		pipelineState->Release();
 		rootSignature->Release();
+		srvDescriptorHeap->Release();
 		swapChainResource[0].resource->Release();
 		swapChainResource[1].resource->Release();
 		rtvDescriptorHeap->Release();
