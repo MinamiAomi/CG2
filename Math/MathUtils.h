@@ -1,10 +1,10 @@
 #pragma once
 #include <cmath>
-#include <Vector2.h>
-#include <Vector3.h>
-#include <Vector4.h>
-#include <Matrix4x4.h>
-#include <MathUtils_inline.h>
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
+#include "MathUtils_inline.h"
 
 namespace Math {
 	constexpr float Pi = 3.141592653589793f;

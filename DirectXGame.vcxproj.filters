@@ -109,5 +109,8 @@
     <None Include="Object3D.VS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
+    <None Include="Object3D.hlsli">
+      <Filter>Resource\Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>
