@@ -82,6 +82,10 @@ inline float LengthSquare(const Vector3& v) { return Dot(v, v); }
 inline float Length(const Vector3& v) { return std::sqrt(LengthSquare(v)); }
 inline Vector3 Normalize(const Vector3& v) { return v * (1.0f / Length(v)); }
 
+inline Vector3 ToVector3(const Vector4& v) {
+	return { v.x,v.y,v.z };
+}
+
 inline Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return {m1.m[0][0] + m2.m[0][0], m1.m[0][1] + m2.m[0][1], m1.m[0][2] + m2.m[0][2],
 	        m1.m[0][3] + m2.m[0][3], m1.m[1][0] + m2.m[1][0], m1.m[1][1] + m2.m[1][1],

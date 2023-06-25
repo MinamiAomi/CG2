@@ -52,6 +52,8 @@ inline float LengthSquare(const Vector3& v);
 inline float Length(const Vector3& v);
 inline Vector3 Normalize(const Vector3& v);
 
+inline Vector3 ToVector3(const Vector4& v);
+
 inline Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
 inline Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
 inline Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2);
