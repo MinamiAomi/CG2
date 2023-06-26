@@ -11,8 +11,8 @@ namespace Math {
 	constexpr float TwoPi = Pi * 2.0f;
 	constexpr float HalfPi = Pi * 0.5f;
 
-	constexpr inline float ToRad(float deg) { return deg * Pi / 180.0f; }
-	constexpr inline float ToDeg(float rad) { return rad * 180.0f / Pi; }
+	constexpr inline float ToRadian = Pi / 180.0f;
+	constexpr inline float ToDegree = 180.0f / Pi;
 
 	Vector3 Transform(const Vector3& v, const Matrix4x4& m);
 	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
@@ -53,6 +53,8 @@ inline float Length(const Vector3& v);
 inline Vector3 Normalize(const Vector3& v);
 
 inline Vector3 ToVector3(const Vector4& v);
+inline Vector3 ToVector3(const Vector2& v, float z);
+inline Vector2 ToVector2(const Vector3& v);
 
 inline Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
 inline Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
