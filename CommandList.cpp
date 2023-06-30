@@ -22,15 +22,14 @@ CommandList::~CommandList() {
     }
 }
 
-void CommandList::Initialize(ID3D12Device* device) {
+void CommandList::Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue) {
     assert(device);
+    assert(commandQueue);
+
+    commandQueue_ = commandQueue;
+    commandQueue_->AddRef();
 
     HRESULT hr = S_FALSE;
-
-    // コマンドキューを生成
-    D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-    hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
-    assert(SUCCEEDED(hr));
 
     // コマンドアロケータを生成
     hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
@@ -49,17 +48,6 @@ void CommandList::Initialize(ID3D12Device* device) {
     fenceEvent_ = CreateEvent(NULL, FALSE, FALSE, NULL);
     assert(fenceEvent_ != nullptr);
 
-}
-
-void CommandList::Finalize() {
-    if (IsEnabled()) {
-        WaitForGPU();
-        CloseHandle(fenceEvent_);
-        fence_->Release();
-        commandList_->Release();
-        commandAllocator_->Release();
-        commandQueue_->Release();
-    }
 }
 
 void CommandList::ExcuteCommand() {

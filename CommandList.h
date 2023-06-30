@@ -9,8 +9,7 @@ public:
     CommandList();
     ~CommandList();
 
-    void Initialize(ID3D12Device* device);
-    void Finalize();
+    void Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue);
 
     void ExcuteCommand();
     void WaitForGPU();
@@ -18,7 +17,6 @@ public:
 
     bool IsEnabled() const { return commandQueue_; }
     ID3D12GraphicsCommandList* Get() const { return commandList_; }
-    ID3D12CommandQueue* GetCommandQueue() const { return commandQueue_; }
 
 private:
     ID3D12CommandQueue* commandQueue_;

@@ -248,8 +248,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
+    ID3D12CommandQueue* commandQueue{ nullptr };
+    {
+        // コマンドキューを生成
+        D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
+        HRESULT hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
+        assert(SUCCEEDED(hr));
+    }
     std::unique_ptr<CommandList> commandList(new CommandList);
-    commandList->Initialize(device);
+    commandList->Initialize(device, commandQueue);
 
     IDXGISwapChain4* swapChain{ nullptr };
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
@@ -274,7 +281,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         swapChainDesc.BufferCount = kSwapChainBufferCount;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;	// モニタに移したら、中身を破棄
         // スワップチェーンを生成
-        hr = dxgiFactory->CreateSwapChainForHwnd(commandList->GetCommandQueue(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+        hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
         assert(SUCCEEDED(hr));
 
         rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kSwapChainBufferCount, false);
@@ -899,6 +906,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         rtvDescriptorHeap->Release();
         swapChain->Release();
         commandList.reset();
+        commandQueue->Release();
         device->Release();
         dxgiFactory->Release();
         CloseWindow(hwnd);
