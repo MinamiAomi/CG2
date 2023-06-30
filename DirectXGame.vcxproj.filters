@@ -60,6 +60,15 @@
     <ClCompile Include="DirectXUtils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderCompiler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandList.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StringUtils.h">
@@ -111,6 +120,15 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="DirectXUtils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderCompiler.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandList.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,11 +3,11 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
-#include <dxcapi.h>
 #include <combaseapi.h>
 
 #include <cstdint>
 #include <cassert>
+#include <memory>
 #include <vector>
 
 #include "Externals/ImGui/imgui.h"
@@ -21,11 +21,12 @@
 #include "StringUtils.h"
 #include "Model.h"
 #include "DirectXUtils.h"
+#include "ShaderCompiler.h"
+#include "CommandList.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
-#pragma comment(lib,"dxcompiler.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -99,16 +100,6 @@ struct TextureResource : public GPUResource {
     D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle{};
 };
 
-class ShaderCompiler {
-public:
-    void Initalize();
-    IDxcBlob* Compile(const std::wstring& filePath, const wchar_t* profile);
-
-private:
-    IDxcUtils* dxcUtils_{ nullptr };
-    IDxcCompiler3* dxcCompiler_{ nullptr };
-    IDxcIncludeHandler* includeHandler_{ nullptr };
-};
 
 // ウィンドウプロシージャ
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
@@ -129,9 +120,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     if (FAILED(CoInitializeEx(0, COINIT_MULTITHREADED))) {
         assert(false);
     }
-
-    Model model;
-    model.LoadFromObj("Resources", "multiMaterial.obj");
 
     HWND hwnd{ nullptr };
     {
@@ -260,64 +248,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     const uint32_t descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     const uint32_t descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-    ID3D12CommandQueue* commandQueue{ nullptr };
-    ID3D12CommandAllocator* commandAllocator{ nullptr };
-    ID3D12GraphicsCommandList* commandList{ nullptr };
-    ID3D12Fence* fence{ nullptr };
-    uint64_t fenceValue{ 0 };
-    HANDLE fenceEvent{ nullptr };
-    auto SubmitCommandList = [&]() {
-        // コマンドリストの内容を確定
-        HRESULT hr = commandList->Close();
-        assert(SUCCEEDED(hr));
-        // GPUにコマンドリストの実行を行わせる
-        ID3D12CommandList* commandLists[] = { commandList };
-        commandQueue->ExecuteCommandLists(1, commandLists);
-        // Fenceの値を更新
-        fenceValue++;
-        // GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-        hr = commandQueue->Signal(fence, fenceValue);
-        assert(SUCCEEDED(hr));
-    };
-    auto WaitForGpu = [&]() {
-        // Fenceの値が指定したSignal値にたどり着いているか確認する
-           // GetCompletedValueの初期値はFence作成時に渡した初期値
-        if (fence->GetCompletedValue() < fenceValue) {
-            // 指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
-            fence->SetEventOnCompletion(fenceValue, fenceEvent);
-            // イベントを待つ
-            WaitForSingleObject(fenceEvent, INFINITE);
-        }
-    };
-    auto ResetCommandList = [&]() {
-        // 次フレーム用のコマンドリストを準備
-        HRESULT hr = commandAllocator->Reset();
-        assert(SUCCEEDED(hr));
-        hr = commandList->Reset(commandAllocator, nullptr);
-        assert(SUCCEEDED(hr));
-    };
-    {
-        HRESULT hr = S_FALSE;
-        // コマンドキューを生成
-        D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
-        hr = device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue));
-        assert(SUCCEEDED(hr));
-
-        // コマンドアロケータを生成
-        hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
-        assert(SUCCEEDED(hr));
-
-        // コマンドリストを生成
-        hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator, nullptr, IID_PPV_ARGS(&commandList));
-        assert(SUCCEEDED(hr));
-
-        // フェンスを生成
-        hr = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-        assert(SUCCEEDED(hr));
-
-        fenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-        assert(fenceEvent != nullptr);
-    }
+    std::unique_ptr<CommandList> commandList(new CommandList);
+    commandList->Initialize(device);
 
     IDXGISwapChain4* swapChain{ nullptr };
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
@@ -342,7 +274,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         swapChainDesc.BufferCount = kSwapChainBufferCount;
         swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;	// モニタに移したら、中身を破棄
         // スワップチェーンを生成
-        hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue, hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
+        hr = dxgiFactory->CreateSwapChainForHwnd(commandList->GetCommandQueue(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain));
         assert(SUCCEEDED(hr));
 
         rtvDescriptorHeap = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kSwapChainBufferCount, false);
@@ -694,10 +626,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
         textureResource.resource = CreateTextureResource(device, metadata);
 
-        ID3D12Resource* intermediateResource = UploadTextureData(textureResource.resource, mipImages, device, commandList);
-        SubmitCommandList();
-        WaitForGpu();
-        ResetCommandList();
+        ID3D12Resource* intermediateResource = UploadTextureData(textureResource.resource, mipImages, device, commandList->Get());
+        commandList->ExcuteCommand();
+        commandList->WaitForGPU();
+        commandList->Reset();
         intermediateResource->Release();
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -718,10 +650,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
         textureResource2.resource = CreateTextureResource(device, metadata);
 
-        ID3D12Resource* intermediateResource = UploadTextureData(textureResource2.resource, mipImages, device, commandList);
-        SubmitCommandList();
-        WaitForGpu();
-        ResetCommandList();
+        ID3D12Resource* intermediateResource = UploadTextureData(textureResource2.resource, mipImages, device, commandList->Get());
+        commandList->ExcuteCommand();
+        commandList->WaitForGPU();
+        commandList->Reset();
         intermediateResource->Release();
 
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
@@ -741,7 +673,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     bool useMonsterBall = false;
 
     {
-        HRESULT hr = S_FALSE;
         MSG msg{};
         // ウィンドウの×ボタンがが押されるまでループ
         while (msg.message != WM_QUIT) {
@@ -755,19 +686,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 ImGui_ImplDX12_NewFrame();
                 ImGui::NewFrame();
 
+                auto cmdList = commandList->Get();
+
                 // これから書き込むバックバッファインデックスを取得
                 uint32_t backBufferIndex = swapChain->GetCurrentBackBufferIndex();
                 // レンダ―ターゲットに遷移
                 auto barrier = swapChainResource[backBufferIndex].TransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET);
                 // TransitionBarrierを張る
-                commandList->ResourceBarrier(1, &barrier);
+                cmdList->ResourceBarrier(1, &barrier);
 
                 // 描画先のRTVを設定
-                commandList->OMSetRenderTargets(1, &rtvHandle[backBufferIndex], false, &dsvHandle);
+                cmdList->OMSetRenderTargets(1, &rtvHandle[backBufferIndex], false, &dsvHandle);
                 // 指定した色で画面全体をクリア
                 float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
-                commandList->ClearRenderTargetView(rtvHandle[backBufferIndex], clearColor, 0, nullptr);
-                commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+                cmdList->ClearRenderTargetView(rtvHandle[backBufferIndex], clearColor, 0, nullptr);
+                cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
                 D3D12_VIEWPORT viewport{};
                 viewport.Width = static_cast<float>(kClientWidth);
@@ -776,17 +709,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 viewport.TopLeftY = 0.0f;
                 viewport.MinDepth = 0.0f;
                 viewport.MaxDepth = 1.0f;
-                commandList->RSSetViewports(1, &viewport);
+                cmdList->RSSetViewports(1, &viewport);
 
                 D3D12_RECT scissorRect{};
                 scissorRect.left = 0;
                 scissorRect.right = kClientWidth;
                 scissorRect.top = 0;
                 scissorRect.bottom = kClientHeight;
-                commandList->RSSetScissorRects(1, &scissorRect);
+                cmdList->RSSetScissorRects(1, &scissorRect);
 
                 ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap };
-                commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+                cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
                 //-----------------------------------------------------------------------------------------//
                 ImGui::SetNextWindowPos({ kClientWidth - 300, 0.0f }, ImGuiCond_Once);
@@ -864,10 +797,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     ImGui::End();
                 }
 
-                commandList->SetGraphicsRootSignature(rootSignature);
-                commandList->SetPipelineState(pipelineState);
-                commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-                commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource.resource->GetGPUVirtualAddress());
+                cmdList->SetGraphicsRootSignature(rootSignature);
+                cmdList->SetPipelineState(pipelineState);
+                cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                cmdList->SetGraphicsRootConstantBufferView(3, directionalLightResource.resource->GetGPUVirtualAddress());
                 if (showObject) {
                     transformSphere.rotate.y += 0.01f;
                     Matrix4x4 worldMatrix = MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
@@ -885,14 +818,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     memcpy(materialResourceSphere.mappedData, &materialData, sizeof(materialData));
 
                     auto vertexBufferView = vertexResourceSphere.View();
-                    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+                    cmdList->IASetVertexBuffers(0, 1, &vertexBufferView);
                     auto indexBufferView = indexResourceSphere.View();
-                    commandList->IASetIndexBuffer(&indexBufferView);
-                    commandList->SetGraphicsRootConstantBufferView(0, transformationMatrixResourceSphere.resource->GetGPUVirtualAddress());
-                    commandList->SetGraphicsRootConstantBufferView(1, materialResourceSphere.resource->GetGPUVirtualAddress());
-                    commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureResource2.gpuHandle : textureResource.gpuHandle);
+                    cmdList->IASetIndexBuffer(&indexBufferView);
+                    cmdList->SetGraphicsRootConstantBufferView(0, transformationMatrixResourceSphere.resource->GetGPUVirtualAddress());
+                    cmdList->SetGraphicsRootConstantBufferView(1, materialResourceSphere.resource->GetGPUVirtualAddress());
+                    cmdList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureResource2.gpuHandle : textureResource.gpuHandle);
                     uint32_t indexCount = indexBufferView.SizeInBytes / sizeof(uint32_t);
-                    commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+                    cmdList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
                 }
                 if (showSprite) {
                     Matrix4x4 worldMatrix = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
@@ -909,14 +842,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                     memcpy(materialResourceSprite.mappedData, &materialData, sizeof(materialData));
 
                     auto vertexBufferView = vertexResourceSprite.View();
-                    commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+                    cmdList->IASetVertexBuffers(0, 1, &vertexBufferView);
                     auto indexBufferView = indexResourceSprite.View();
-                    commandList->IASetIndexBuffer(&indexBufferView);
-                    commandList->SetGraphicsRootConstantBufferView(0, transformationMatrixResourceSprite.resource->GetGPUVirtualAddress());
-                    commandList->SetGraphicsRootConstantBufferView(1, materialResourceSprite.resource->GetGPUVirtualAddress());
-                    commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureResource2.gpuHandle : textureResource.gpuHandle);
+                    cmdList->IASetIndexBuffer(&indexBufferView);
+                    cmdList->SetGraphicsRootConstantBufferView(0, transformationMatrixResourceSprite.resource->GetGPUVirtualAddress());
+                    cmdList->SetGraphicsRootConstantBufferView(1, materialResourceSprite.resource->GetGPUVirtualAddress());
+                    cmdList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureResource2.gpuHandle : textureResource.gpuHandle);
                     uint32_t indexCount = indexBufferView.SizeInBytes / sizeof(uint32_t);
-                    commandList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+                    cmdList->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
                 }
 
 
@@ -924,39 +857,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
                 ImGui::Render();
-                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
+                ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
 
                 // RenderTargetからPresentへ
                 barrier = swapChainResource[backBufferIndex].TransitionBarrier(D3D12_RESOURCE_STATE_PRESENT);
                 // TransitionBarrierを張る
-                commandList->ResourceBarrier(1, &barrier);
+                cmdList->ResourceBarrier(1, &barrier);
 
-                // コマンドリストの内容を確定
-                hr = commandList->Close();
-                assert(SUCCEEDED(hr));
-                // GPUにコマンドリストの実行を行わせる
-                ID3D12CommandList* commandLists[] = { commandList };
-                commandQueue->ExecuteCommandLists(1, commandLists);
+                commandList->ExcuteCommand();
                 // GPUとOSに画面交換を行うよう通知する
                 swapChain->Present(1, 0);
-                // Fenceの値を更新
-                fenceValue++;
-                // GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-                hr = commandQueue->Signal(fence, fenceValue);
-                assert(SUCCEEDED(hr));
-                // Fenceの値が指定したSignal値にたどり着いているか確認する
-                // GetCompletedValueの初期値はFence作成時に渡した初期値
-                if (fence->GetCompletedValue() < fenceValue) {
-                    // 指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
-                    fence->SetEventOnCompletion(fenceValue, fenceEvent);
-                    // イベントを待つ
-                    WaitForSingleObject(fenceEvent, INFINITE);
-                }
-                // 次フレーム用のコマンドリストを準備
-                hr = commandAllocator->Reset();
-                assert(SUCCEEDED(hr));
-                hr = commandList->Reset(commandAllocator, nullptr);
-                assert(SUCCEEDED(hr));
+                commandList->WaitForGPU();
+                commandList->Reset();
             }
         }
     }
@@ -986,11 +898,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         swapChainResource[1].resource->Release();
         rtvDescriptorHeap->Release();
         swapChain->Release();
-        CloseHandle(fenceEvent);
-        fence->Release();
-        commandList->Release();
-        commandAllocator->Release();
-        commandQueue->Release();
+        commandList.reset();
         device->Release();
         dxgiFactory->Release();
         CloseWindow(hwnd);
@@ -1036,65 +944,5 @@ D3D12_INDEX_BUFFER_VIEW IndexResource::View() {
     view.SizeInBytes = static_cast<uint32_t>(resource->GetDesc().Width);
     view.Format = DXGI_FORMAT_R32_UINT;
     return view;
-}
-
-void ShaderCompiler::Initalize() {
-    HRESULT hr = S_FALSE;
-
-    hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
-    assert(SUCCEEDED(hr));
-    hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
-    assert(SUCCEEDED(hr));
-
-    hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
-    assert(SUCCEEDED(hr));
-}
-
-IDxcBlob* ShaderCompiler::Compile(const std::wstring& filePath, const wchar_t* profile) {
-    Log(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile));
-
-    IDxcBlobEncoding* shaderSource = nullptr;
-    HRESULT hr = S_FALSE;
-    hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
-    assert(SUCCEEDED(hr));
-
-    DxcBuffer shaderSourceBuffer{};
-    shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-    shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-    shaderSourceBuffer.Encoding = DXC_CP_UTF8;
-
-    LPCWSTR arguments[] = {
-        filePath.c_str(),
-        L"-E", L"main",
-        L"-T", profile,
-        L"-Zi", L"-Qembed_debug",
-        L"-Od",
-        L"-Zpr"
-    };
-
-    IDxcResult* shaderResult = nullptr;
-    hr = dxcCompiler_->Compile(
-        &shaderSourceBuffer,
-        arguments,
-        _countof(arguments),
-        includeHandler_,
-        IID_PPV_ARGS(&shaderResult));
-    assert(SUCCEEDED(hr));
-
-    IDxcBlobUtf8* shaderError = nullptr;
-    shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-    if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-        Log(shaderError->GetStringPointer());
-        assert(false);
-    }
-
-    IDxcBlob* shaderBlob = nullptr;
-    hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-    assert(SUCCEEDED(hr));
-
-    Log(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile));
-    shaderSource->Release();
-    shaderResult->Release();
-    return shaderBlob;
 }
 

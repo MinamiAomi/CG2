@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "Math/MathUtils.h"
 
@@ -32,7 +33,7 @@ public:
     };
 
     void LoadFromObj(const std::string& directioryPath, const std::string& fileName);
-    Object* CreateObject();
+    std::shared_ptr<Object> CreateObject();
 
 private:
     struct VertexData {

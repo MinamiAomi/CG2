@@ -93,6 +93,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommandList.cpp" />
     <ClCompile Include="DirectXUtils.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
@@ -104,9 +105,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommandList.h" />
     <ClInclude Include="DirectXUtils.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
@@ -123,6 +127,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
