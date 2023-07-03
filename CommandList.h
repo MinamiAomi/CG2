@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include <wrl.h>
 
 #include <cstdint>
 
@@ -9,20 +10,20 @@ public:
     CommandList();
     ~CommandList();
 
-    void Initialize(ID3D12Device* device, ID3D12CommandQueue* commandQueue);
+    void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue);
 
     void ExcuteCommand();
     void WaitForGPU();
     void Reset();
 
     bool IsEnabled() const { return commandQueue_; }
-    ID3D12GraphicsCommandList* Get() const { return commandList_; }
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Get() const { return commandList_; }
 
 private:
-    ID3D12CommandQueue* commandQueue_;
-    ID3D12CommandAllocator* commandAllocator_;
-    ID3D12GraphicsCommandList* commandList_;
-    ID3D12Fence* fence_;
+    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
+    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+    Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
     HANDLE fenceEvent_;
     uint64_t fenceValue_;
 };

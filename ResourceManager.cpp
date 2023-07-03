@@ -4,29 +4,15 @@
 #include "DirectXUtils.h"
 
 ResourceManager::ResourceManager() :
-    device_(nullptr),
-    commandList_(nullptr),
-    descriptorHeap_(nullptr),
     descriptorMaxCount_(0),
     descriptorAllocationIndex_(0) {
 }
 
-ResourceManager::~ResourceManager() {
-    device_->Release();
-    commandList_->Release();
-    descriptorHeap_->Release();
-    for (auto& texture : textures_) {
-        texture.resource->Release();
-    }
-}
-
-void ResourceManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, uint32_t descriptorMaxCount) {
+void ResourceManager::Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, std::shared_ptr<CommandList> commandList, uint32_t descriptorMaxCount) {
     assert(device);
     assert(commandList);
     device_ = device;
-    device_->AddRef();
     commandList_ = commandList;
-    commandList_->AddRef();
 
     descriptorSize_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     descriptorMaxCount_ = descriptorMaxCount;
@@ -38,7 +24,7 @@ void ResourceManager::Initialize(ID3D12Device* device, ID3D12GraphicsCommandList
     for (auto& texture : textures_) {
         texture.cpuHandle = {0};
         texture.gpuHandle = {0};
-        texture.resource = nullptr;
+        texture.resource.Reset();
     }
 }
 
@@ -48,7 +34,7 @@ uint32_t ResourceManager::LoadTexture(const std::string& name) {
     auto texturesEnd = textures_.begin() + descriptorAllocationIndex_;
     auto iter = std::find_if(textures_.begin(), texturesEnd,
         [&](const Texture& texture) {
-            if (texture.resource != nullptr && texture.name == name) {
+            if (texture.resource && texture.name == name) {
                 return true;
             }
             return false;
@@ -68,7 +54,7 @@ uint32_t ResourceManager::LoadTexture(const std::string& name) {
     return handle;
 }
 
-ID3D12Resource* ResourceManager::CreateBufferResource(size_t bufferSize) {
+Microsoft::WRL::ComPtr<ID3D12Resource> ResourceManager::CreateBufferResource(size_t bufferSize) {
     // アップロードヒープ
     D3D12_HEAP_PROPERTIES uploadHeapProperties{};
     uploadHeapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -81,7 +67,7 @@ ID3D12Resource* ResourceManager::CreateBufferResource(size_t bufferSize) {
     bufferDesc.MipLevels = 1;
     bufferDesc.SampleDesc.Count = 1;
     bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    ID3D12Resource* result = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> result = nullptr;
     // 頂点バッファを生成
     HRESULT hr = S_FALSE;
     hr = device_->CreateCommittedResource(
@@ -90,7 +76,7 @@ ID3D12Resource* ResourceManager::CreateBufferResource(size_t bufferSize) {
         &bufferDesc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&result));
+        IID_PPV_ARGS(result.GetAddressOf()));
     assert(SUCCEEDED(hr));
     return result;
 }
