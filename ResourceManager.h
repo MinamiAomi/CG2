@@ -20,7 +20,7 @@ class ResourceManager {
 public:
     ResourceManager();
 
-    void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, std::shared_ptr<CommandList> commandList, uint32_t descriptorMaxCount);
+    void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, const std::shared_ptr<CommandList>& commandList, uint32_t descriptorMaxCount);
 
     uint32_t LoadTexture(const std::string& name);
 
@@ -61,7 +61,7 @@ public:
 
 private:
     Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t bufferSize);
-    void InternalLoadTexture(const std::string& name, );
+    void InternalLoadTexture(const std::string& name, size_t index);
 
     struct Texture {
         std::string name;

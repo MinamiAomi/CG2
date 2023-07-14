@@ -104,7 +104,7 @@ struct TextureResource : public GPUResource {
 class D3DResourceLeakChecker {
 public:
     ~D3DResourceLeakChecker() {
-         Microsoft::WRL::ComPtr<IDXGIDebug1> debug = nullptr;
+        Microsoft::WRL::ComPtr<IDXGIDebug1> debug = nullptr;
         if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.GetAddressOf())))) {
             debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
             debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
@@ -342,7 +342,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0),
             GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 0));
     }
-  
+
     ShaderCompiler shaderCompiler;
     shaderCompiler.Initalize();
 
@@ -726,7 +726,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 scissorRect.bottom = kClientHeight;
                 cmdList->RSSetScissorRects(1, &scissorRect);
 
-                ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap.Get()};
+                ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap.Get() };
                 cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
                 //-----------------------------------------------------------------------------------------//
@@ -802,6 +802,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                         }
                         ImGui::TreePop();
                     }
+
                     ImGui::End();
                 }
 
@@ -886,33 +887,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
 
-       /* indexResourceSprite.resource->Release();
-        transformationMatrixResourceSprite.resource->Release();
-        materialResourceSprite.resource->Release();
-        vertexResourceSprite.resource->Release();
-        textureResource2.resource->Release();
-        textureResource.resource->Release();
-        transformationMatrixResourceSphere.resource->Release();
-        materialResourceSphere.resource->Release();
-        indexResourceSphere.resource->Release();
-        vertexResourceSphere.resource->Release();
-        directionalLightResource.resource->Release();
-        pipelineState->Release();
-        rootSignature->Release();
-        srvDescriptorHeap->Release();
-        dsvDescriptorHeap->Release();
-        depthStencilResource->Release();
-        swapChainResource[0].resource->Release();
-        swapChainResource[1].resource->Release();
-        rtvDescriptorHeap->Release();
-        swapChain->Release();
-        commandList.reset();
-        commandQueue->Release();
-        device->Release();
-        dxgiFactory->Release();*/
+        /* indexResourceSprite.resource->Release();
+         transformationMatrixResourceSprite.resource->Release();
+         materialResourceSprite.resource->Release();
+         vertexResourceSprite.resource->Release();
+         textureResource2.resource->Release();
+         textureResource.resource->Release();
+         transformationMatrixResourceSphere.resource->Release();
+         materialResourceSphere.resource->Release();
+         indexResourceSphere.resource->Release();
+         vertexResourceSphere.resource->Release();
+         directionalLightResource.resource->Release();
+         pipelineState->Release();
+         rootSignature->Release();
+         srvDescriptorHeap->Release();
+         dsvDescriptorHeap->Release();
+         depthStencilResource->Release();
+         swapChainResource[0].resource->Release();
+         swapChainResource[1].resource->Release();
+         rtvDescriptorHeap->Release();
+         swapChain->Release();
+         commandList.reset();
+         commandQueue->Release();
+         device->Release();
+         dxgiFactory->Release();*/
         CloseWindow(hwnd);
 
-       
+
     }
 
     CoUninitialize();

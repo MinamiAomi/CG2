@@ -8,7 +8,7 @@ ResourceManager::ResourceManager() :
     descriptorAllocationIndex_(0) {
 }
 
-void ResourceManager::Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, std::shared_ptr<CommandList> commandList, uint32_t descriptorMaxCount) {
+void ResourceManager::Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, const std::shared_ptr<CommandList>& commandList, uint32_t descriptorMaxCount) {
     assert(device);
     assert(commandList);
     device_ = device;
@@ -22,8 +22,8 @@ void ResourceManager::Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, st
 
     textures_.resize(descriptorMaxCount_);
     for (auto& texture : textures_) {
-        texture.cpuHandle = {0};
-        texture.gpuHandle = {0};
+        texture.cpuHandle = { 0 };
+        texture.gpuHandle = { 0 };
         texture.resource.Reset();
     }
 }
@@ -44,10 +44,7 @@ uint32_t ResourceManager::LoadTexture(const std::string& name) {
         return static_cast<uint32_t>(std::distance(textures_.begin(), iter));
     }
 
-    auto& texture = textures_[descriptorAllocationIndex_];
-
-    texture.name = name;
-
+    InternalLoadTexture(name, descriptorAllocationIndex_);
 
     uint32_t handle = descriptorAllocationIndex_;
     ++descriptorAllocationIndex_;
@@ -79,4 +76,30 @@ Microsoft::WRL::ComPtr<ID3D12Resource> ResourceManager::CreateBufferResource(siz
         IID_PPV_ARGS(result.GetAddressOf()));
     assert(SUCCEEDED(hr));
     return result;
+}
+
+void ResourceManager::InternalLoadTexture(const std::string& name, size_t index) {
+    auto& texture = textures_[index];
+
+    texture.name = name;
+
+    auto mipImages = ::LoadTexture("resources/monsterBall.png");
+    const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+    texture.resource = CreateTextureResource(device_, metadata);
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = UploadTextureData(texture.resource, mipImages, device_, commandList_->Get());
+    commandList_->ExcuteCommand();
+    commandList_->WaitForGPU();
+    commandList_->Reset();
+    
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = metadata.format;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+    texture.cpuHandle = GetCPUDescriptorHandle(descriptorHeap_, descriptorSize_, uint32_t(index));
+    texture.gpuHandle = GetGPUDescriptorHandle(descriptorHeap_, descriptorSize_, uint32_t(index));
+
+    device_->CreateShaderResourceView(texture.resource.Get(), &srvDesc, texture.cpuHandle);
 }
