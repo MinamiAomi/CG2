@@ -94,6 +94,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommandList.cpp" />
+    <ClCompile Include="CommandQueue.cpp" />
     <ClCompile Include="DirectXUtils.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
@@ -102,6 +103,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -111,6 +113,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandList.h" />
+    <ClInclude Include="CommandQueue.h" />
     <ClInclude Include="DirectXUtils.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
@@ -120,6 +123,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Externals\ImGui\imstb_textedit.h" />
     <ClInclude Include="Externals\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Device.h" />
     <ClInclude Include="Math\MathUtils.h" />
     <ClInclude Include="Math\MathUtils_inline.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
@@ -130,6 +135,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="TypeUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Object3D.hlsli">

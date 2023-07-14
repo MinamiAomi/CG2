@@ -22,6 +22,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="DirectX">
+      <UniqueIdentifier>{d70244df-b1f0-4d40-905b-953e102bc592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -67,7 +70,13 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="CommandList.cpp">
-      <Filter>Source</Filter>
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandQueue.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource.cpp">
+      <Filter>DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,8 +137,20 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="CommandList.h">
+    <ClInclude Include="TypeUtils.h">
       <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandQueue.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandList.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

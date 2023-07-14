@@ -5,25 +5,34 @@
 
 #include <cstdint>
 
-class CommandList {
-public:
-    CommandList();
-    ~CommandList();
+namespace CG::DX12 {
+    using namespace Microsoft::WRL;
 
-    void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue);
+    class CommandList {
+    public:
+        CommandList();
+        ~CommandList();
 
-    void ExcuteCommand();
-    void WaitForGPU();
-    void Reset();
+        void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue);
 
-    bool IsEnabled() const { return commandQueue_; }
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Get() const { return commandList_; }
+        void ExcuteCommand();
+        void WaitForGPU();
+        void Reset();
 
-private:
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-    Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
-    Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
-    HANDLE fenceEvent_;
-    uint64_t fenceValue_;
-};
+        bool IsEnabled() const { return commandQueue_; }
+        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Get() const { return commandList_; }
+        Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() const { return commandQueue_; }
+        Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() const { return fence_; }
+        HANDLE GetFenceEvent() const { return fenceEvent_; }
+        uint64_t GetFenceValue() const { return fenceValue_; }
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
+        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+        Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
+        HANDLE fenceEvent_;
+        uint64_t fenceValue_;
+    };
+
+}
