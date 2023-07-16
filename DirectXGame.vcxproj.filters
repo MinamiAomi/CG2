@@ -78,28 +78,37 @@
     <ClCompile Include="Resource.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="DescriptorHeap.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Fence.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Device.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Descriptor.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Views.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="RootSignature.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StringUtils.h">
       <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathUtils_inline.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\MathUtils.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix4x4.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="Externals\ImGui\imconfig.h">
       <Filter>ImGui</Filter>
@@ -137,12 +146,6 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="TypeUtils.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Device.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="CommandQueue.h">
       <Filter>DirectX</Filter>
     </ClInclude>
@@ -150,6 +153,42 @@
       <Filter>DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathUtils.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Views.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorHeap.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Fence.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Descriptor.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="CG_DX12.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="RootSignature.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
       <Filter>DirectX</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,35 +4,36 @@
 #include <wrl.h>
 
 #include <cstdint>
+#include <initializer_list>
 
 namespace CG::DX12 {
     using namespace Microsoft::WRL;
 
+    class Device;
+    class CommandQueue;
+    class VertexBufferView;
+    class IndexBufferView;
+
     class CommandList {
     public:
-        CommandList();
-        ~CommandList();
-
-        void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue);
-
-        void ExcuteCommand();
-        void WaitForGPU();
+        void Initialize(const Device& device, const CommandQueue& commandQueue);
+        void Close();
         void Reset();
 
-        bool IsEnabled() const { return commandQueue_; }
-        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> Get() const { return commandList_; }
-        Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() const { return commandQueue_; }
-        Microsoft::WRL::ComPtr<ID3D12Fence> GetFence() const { return fence_; }
-        HANDLE GetFenceEvent() const { return fenceEvent_; }
-        uint64_t GetFenceValue() const { return fenceValue_; }
+        void SetVertexBuffer(uint32_t startSlot, const VertexBufferView& view);
+        void SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBufferView*> views);
+        void SetIndexBuffer(const IndexBufferView& view);
+
+        bool IsEnabled() const { return commandList_; }
+        bool IsRecording() const { return isRecording_; }
+        ComPtr<ID3D12GraphicsCommandList> GetCommandList() const { return commandList_; }
+        D3D12_COMMAND_LIST_TYPE GetType() const { return type_; }
 
     private:
-        Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
-        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
-        Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
-        HANDLE fenceEvent_;
-        uint64_t fenceValue_;
+        ComPtr<ID3D12CommandAllocator> commandAllocator_;
+        ComPtr<ID3D12GraphicsCommandList> commandList_;
+        D3D12_COMMAND_LIST_TYPE type_{ D3D12_COMMAND_LIST_TYPE_DIRECT };
+        bool isRecording_{ false };
     };
 
 }
