@@ -64,14 +64,14 @@ namespace CG::DX12 {
             AddressMode addressV = AddressMode::Wrap,
             AddressMode addressW = AddressMode::Wrap,
             D3D12_FILTER filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR);
-        void AddFlags(D3D12_ROOT_SIGNATURE_FLAGS flags);
+        void AddFlag(D3D12_ROOT_SIGNATURE_FLAGS flag);
         void Clear();
 
     private:
         std::vector<std::vector<D3D12_DESCRIPTOR_RANGE>> ranges_;
         std::vector<D3D12_ROOT_PARAMETER> rootParameters_;
         std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplerDescs_;
-        D3D12_ROOT_SIGNATURE_FLAGS flags_ = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+        D3D12_ROOT_SIGNATURE_FLAGS flag_ = D3D12_ROOT_SIGNATURE_FLAG_NONE;
         D3D12_ROOT_SIGNATURE_DESC desc_{};
 
     };

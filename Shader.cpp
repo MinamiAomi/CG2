@@ -4,7 +4,7 @@
 #include <fstream>
 
 namespace CG::DX12 {
-
+ 
     void Shader::Initialize(const char* data, size_t size) {
         data_.resize(size);
         memcpy(&data_[0], data, size);

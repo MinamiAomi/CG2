@@ -24,7 +24,7 @@ namespace CG::DX12 {
             desc_.NumStaticSamplers = static_cast<uint32_t>(staticSamplerDescs_.size());
             desc_.pStaticSamplers = staticSamplerDescs_.data();
         }
-        desc_.Flags = flags_;
+        desc_.Flags = flag_;
 
         return desc_;
     }
@@ -78,15 +78,15 @@ namespace CG::DX12 {
         staticSamplerDesc.ShaderVisibility = static_cast<D3D12_SHADER_VISIBILITY>(shaderVisibility);
     }
 
-    void RootSignatureDesc::AddFlags(D3D12_ROOT_SIGNATURE_FLAGS flags) {
-        flags_ |= flags;
+    void RootSignatureDesc::AddFlag(D3D12_ROOT_SIGNATURE_FLAGS flag) {
+        flag_ |= flag;
     }
 
     void RootSignatureDesc::Clear() {
         ranges_.clear();
         rootParameters_.clear();
         staticSamplerDescs_.clear();
-        flags_ = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+        flag_ = D3D12_ROOT_SIGNATURE_FLAG_NONE;
     }
 
     void RootSignature::Initialize(const Device& device, const D3D12_ROOT_SIGNATURE_DESC& desc) {
