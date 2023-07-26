@@ -83,6 +83,7 @@ namespace CG::DX12 {
     }
 
     void RootSignatureDesc::Clear() {
+        desc_ = {};
         ranges_.clear();
         rootParameters_.clear();
         staticSamplerDescs_.clear();

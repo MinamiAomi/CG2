@@ -63,46 +63,49 @@
     <ClCompile Include="DirectXUtils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderCompiler.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="CommandList.cpp">
+    <ClCompile Include="DX12\CommandList.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="CommandQueue.cpp">
+    <ClCompile Include="DX12\CommandQueue.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Resource.cpp">
+    <ClCompile Include="DX12\Descriptor.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="DescriptorHeap.cpp">
+    <ClCompile Include="DX12\DescriptorHeap.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Fence.cpp">
+    <ClCompile Include="DX12\Device.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Device.cpp">
+    <ClCompile Include="DX12\DX12.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Descriptor.cpp">
+    <ClCompile Include="DX12\Fence.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="SwapChain.cpp">
+    <ClCompile Include="DX12\PipelineState.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Views.cpp">
+    <ClCompile Include="DX12\Resource.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="RootSignature.cpp">
+    <ClCompile Include="DX12\RootSignature.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineState.cpp">
+    <ClCompile Include="DX12\Shader.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
+    <ClCompile Include="DX12\ShaderCompiler.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\SwapChain.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\Views.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,50 +149,59 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="CommandQueue.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandList.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="Math\MathUtils.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="SwapChain.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="Views.h">
-      <Filter>DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="DescriptorHeap.h">
+    <ClInclude Include="DX12\CommandList.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Fence.h">
+    <ClInclude Include="DX12\CommandQueue.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Device.h">
+    <ClInclude Include="DX12\Descriptor.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Descriptor.h">
+    <ClInclude Include="DX12\DescriptorHeap.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="CG_DX12.h">
+    <ClInclude Include="DX12\Device.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="RootSignature.h">
+    <ClInclude Include="DX12\DX12.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="PipelineState.h">
+    <ClInclude Include="DX12\Fence.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
+    <ClInclude Include="DX12\PipelineState.h">
       <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Resource.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\RootSignature.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Shader.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\ShaderCompiler.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\SwapChain.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Views.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjLoader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

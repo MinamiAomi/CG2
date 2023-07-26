@@ -44,7 +44,6 @@ namespace CG::DX12 {
     };
 
     class RootSignatureDesc {
-        friend class RootSignature;
     public:
         operator const D3D12_ROOT_SIGNATURE_DESC& ();
 

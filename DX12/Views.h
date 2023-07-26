@@ -35,7 +35,7 @@ namespace CG::DX12 {
 
     class IndexBufferView {
     public:
-        enum Format {
+        enum class Format {
             UInt16 = DXGI_FORMAT_R16_UINT,
             UInt32 = DXGI_FORMAT_R32_UINT
         };
@@ -44,7 +44,7 @@ namespace CG::DX12 {
             const Resource& resurce,
             size_t bufferSize,
             size_t indexCount,
-            Format format = UInt32,
+            Format format = Format::UInt32,
             int32_t startIndexLocation = 0);
 
         bool IsEnabled() const { return view_.BufferLocation; }

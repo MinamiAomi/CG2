@@ -14,56 +14,40 @@ namespace CG::DX12 {
     class Shader;
 
     enum class BlendMode {
-        None,		// 合成なし
-        Normal,		// 通常
-        Add,		// 加算合成
-        Subtract,	// 減算合成
-        Multiply,	// 乗算合成
-        Inverse		// 反転
+        None,       // 合成なし
+        Normal,     // 通常
+        Add,        // 加算合成
+        Subtract,   // 減算合成
+        Multiply,   // 乗算合成
+        Inverse     // 反転
     };
     // カリングモード
     enum class CullMode {
-        None = D3D12_CULL_MODE_NONE,	// カリングしない
-        Front = D3D12_CULL_MODE_FRONT,	// 前面カリング
-        Back = D3D12_CULL_MODE_BACK,	// 背面カリング
+        None = D3D12_CULL_MODE_NONE,    // カリングしない
+        Front = D3D12_CULL_MODE_FRONT,  // 前面カリング
+        Back = D3D12_CULL_MODE_BACK,    // 背面カリング
+    };
+    // フィルモード
+    enum class FillMode {
+        Solid = D3D12_FILL_MODE_SOLID,
+        WireFrame = D3D12_FILL_MODE_WIREFRAME,
     };
     // 比較関数
     enum class ComparisonFunc {
-        Never = D3D12_COMPARISON_FUNC_NEVER,				// 比較に成功しない
-        Less = D3D12_COMPARISON_FUNC_LESS,					// 小さい場合
-        Equal = D3D12_COMPARISON_FUNC_EQUAL,				// 等しい場合
-        LessEqual = D3D12_COMPARISON_FUNC_LESS_EQUAL,		// 以下の場合
-        Greater = D3D12_COMPARISON_FUNC_GREATER,			// より大きい場合
-        NotEqual = D3D12_COMPARISON_FUNC_NOT_EQUAL,			// 等しくない場合
-        GreaterEqual = D3D12_COMPARISON_FUNC_GREATER_EQUAL,	// 以上の場合
-        Always = D3D12_COMPARISON_FUNC_ALWAYS				// 比較を渡す
+        Never = D3D12_COMPARISON_FUNC_NEVER,                // 比較に成功しない
+        Less = D3D12_COMPARISON_FUNC_LESS,                  // 小さい場合
+        Equal = D3D12_COMPARISON_FUNC_EQUAL,                // 等しい場合
+        LessEqual = D3D12_COMPARISON_FUNC_LESS_EQUAL,       // 以下の場合
+        Greater = D3D12_COMPARISON_FUNC_GREATER,            // より大きい場合
+        NotEqual = D3D12_COMPARISON_FUNC_NOT_EQUAL,         // 等しくない場合
+        GreaterEqual = D3D12_COMPARISON_FUNC_GREATER_EQUAL, // 以上の場合
+        Always = D3D12_COMPARISON_FUNC_ALWAYS               // 比較を渡す
     };
     // プリミティブ型
     enum class PrimitiveTopology {
         Point = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT,		// 点
         Line = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE,			// 線
         Triangle = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE	// 三角形
-    };
-
-    class BlendDesc {
-        friend class GraphicsPipelineStateDesc;
-    public:
-        void AddRenderTargetDesc(BlendMode blendMode, DXGI_FORMAT format);
-    private:
-        D3D12_BLEND_DESC desc_{};
-        DXGI_FORMAT rtvFormats_[8];
-        uint32_t renderTargetCount_{ 0 };
-    };
-
-    class InputLayoutDesc {
-        friend class GraphicsPipelineStateDesc;
-    public:
-        void AddVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot);
-        void AddInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot, uint32_t instanceDataStepRate);
-    private:
-        D3D12_INPUT_LAYOUT_DESC desc_;
-        std::vector<D3D12_INPUT_ELEMENT_DESC> elements_;
-        std::vector<std::string> semanticNames_;
     };
 
     class GraphicsPipelineStateDesc {
@@ -76,15 +60,21 @@ namespace CG::DX12 {
         void SetDomeinShader(const Shader& shader);
         void SetHullShader(const Shader& shader);
         void SetGeometryShader(const Shader& shader);
-        void SetInputLayout(const InputLayoutDesc& inputLayout);
-        void SetRasterizerState(CullMode cullMode, bool fillModeSolidOrWireFrame = true);
-        void SetSampleState(uint32_t count, uint32_t quality);
+        void AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot);
+        void AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot, uint32_t instanceDataStepRate);
+        void SetRasterizerState(CullMode cullMode = CullMode::Back, FillMode fillMode = FillMode::Solid);
+        void SetSampleState(uint32_t count = 1, uint32_t quality = 0);
         void SetPrimitiveTopologyType(PrimitiveTopology primitiveTopology);
-        void SetBlendDesc(const BlendDesc& blendDesc);
+        void AddRenderTargetState(BlendMode blendMode, DXGI_FORMAT rtvFormat);
         void SetDepthState(DXGI_FORMAT dsvFormat, ComparisonFunc comparisonFunc = ComparisonFunc::LessEqual, bool depthWriteMaskAllOrZero = true);
         void SetStencilState(uint8_t readMask, uint8_t writeMask);
+        void Clear();
+        
     private:
         D3D12_GRAPHICS_PIPELINE_STATE_DESC desc_;
+        uint32_t renderTargetCount_{ 0 };
+        std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements_;
+        std::vector<std::string> semanticNames_;
     };
 
     class ComputePipelineStateDesc {
@@ -108,6 +98,6 @@ namespace CG::DX12 {
         ComPtr<ID3D12PipelineState> pipelineState_;
     };
 
-   
+
 
 }

@@ -93,12 +93,21 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommandList.cpp" />
-    <ClCompile Include="CommandQueue.cpp" />
-    <ClCompile Include="Descriptor.cpp" />
-    <ClCompile Include="DescriptorHeap.cpp" />
-    <ClCompile Include="Device.cpp" />
     <ClCompile Include="DirectXUtils.cpp" />
+    <ClCompile Include="DX12\CommandList.cpp" />
+    <ClCompile Include="DX12\CommandQueue.cpp" />
+    <ClCompile Include="DX12\Descriptor.cpp" />
+    <ClCompile Include="DX12\DescriptorHeap.cpp" />
+    <ClCompile Include="DX12\Device.cpp" />
+    <ClCompile Include="DX12\DX12.cpp" />
+    <ClCompile Include="DX12\Fence.cpp" />
+    <ClCompile Include="DX12\PipelineState.cpp" />
+    <ClCompile Include="DX12\Resource.cpp" />
+    <ClCompile Include="DX12\RootSignature.cpp" />
+    <ClCompile Include="DX12\Shader.cpp" />
+    <ClCompile Include="DX12\ShaderCompiler.cpp" />
+    <ClCompile Include="DX12\SwapChain.cpp" />
+    <ClCompile Include="DX12\Views.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_draw.cpp" />
@@ -106,28 +115,28 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="Fence.cpp" />
-    <ClCompile Include="PipelineState.cpp" />
-    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="RootSignature.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="ShaderCompiler.cpp" />
     <ClCompile Include="StringUtils.cpp" />
-    <ClCompile Include="SwapChain.cpp" />
-    <ClCompile Include="Views.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CG_DX12.h" />
-    <ClInclude Include="CommandList.h" />
-    <ClInclude Include="CommandQueue.h" />
-    <ClInclude Include="Descriptor.h" />
-    <ClInclude Include="DescriptorHeap.h" />
-    <ClInclude Include="Device.h" />
     <ClInclude Include="DirectXUtils.h" />
+    <ClInclude Include="DX12\CommandList.h" />
+    <ClInclude Include="DX12\CommandQueue.h" />
+    <ClInclude Include="DX12\Descriptor.h" />
+    <ClInclude Include="DX12\DescriptorHeap.h" />
+    <ClInclude Include="DX12\Device.h" />
+    <ClInclude Include="DX12\DX12.h" />
+    <ClInclude Include="DX12\Fence.h" />
+    <ClInclude Include="DX12\PipelineState.h" />
+    <ClInclude Include="DX12\Resource.h" />
+    <ClInclude Include="DX12\RootSignature.h" />
+    <ClInclude Include="DX12\Shader.h" />
+    <ClInclude Include="DX12\ShaderCompiler.h" />
+    <ClInclude Include="DX12\SwapChain.h" />
+    <ClInclude Include="DX12\Views.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
     <ClInclude Include="Externals\ImGui\imgui_impl_dx12.h" />
@@ -136,19 +145,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Externals\ImGui\imstb_textedit.h" />
     <ClInclude Include="Externals\ImGui\imstb_truetype.h" />
-    <ClInclude Include="Fence.h" />
     <ClInclude Include="Math\MathUtils.h" />
-    <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="RootSignature.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderCompiler.h" />
     <ClInclude Include="StringUtils.h" />
-    <ClInclude Include="SwapChain.h" />
     <ClInclude Include="Utils.h" />
-    <ClInclude Include="Views.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Object3D.hlsli">

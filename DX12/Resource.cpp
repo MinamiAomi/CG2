@@ -6,20 +6,14 @@
 
 namespace CG::DX12 {
 
-    Resource::Resource() :
-        currentState_(D3D12_RESOURCE_STATE_COMMON),
-        heap_(Heap::Unknown),
-        flag_(Flag::None) {
-    }
-
     void Resource::Initialize(
         const Device& device,
-        Heap heap,
+        HeapType heap,
         const D3D12_RESOURCE_DESC& resourceDesc,
-        D3D12_RESOURCE_STATES initialResourceState,
+        State initialState,
         const D3D12_CLEAR_VALUE* optimizedClearValue) {
         assert(device.IsEnabled());
-        assert(heap != Heap::Unknown);
+        assert(heap != HeapType::Unknown);
 
         resource_.Reset();
 
@@ -30,18 +24,18 @@ namespace CG::DX12 {
             &heapProperties,
             D3D12_HEAP_FLAG_NONE,
             &resourceDesc,
-            initialResourceState,
+            static_cast<D3D12_RESOURCE_STATES>(initialState),
             optimizedClearValue,
             IID_PPV_ARGS(resource_.GetAddressOf())))) {
             assert(false);
         }
-        currentState_ = initialResourceState;
+        currentState_ = initialState;
         heap_ = heap;
     }
 
     void Resource::InitializeForResource(
         ComPtr<ID3D12Resource> resource,
-        D3D12_RESOURCE_STATES state) {
+        State state) {
         assert(resource);
         D3D12_HEAP_PROPERTIES heapProperties{};
         D3D12_HEAP_FLAGS heapFlags{};
@@ -50,17 +44,17 @@ namespace CG::DX12 {
         }
         resource_ = resource;
         currentState_ = state;
-        heap_ = static_cast<Heap>(heapProperties.Type);
+        heap_ = static_cast<HeapType>(heapProperties.Type);
     }
 
     void Resource::InitializeForBuffer(
         const Device& device,
-        Heap heap,
         size_t bufferSize,
-        D3D12_RESOURCE_STATES initialResourceState,
+        State initialState,
+        HeapType heap,
         Flag flag) {
         assert(device.IsEnabled());
-        assert(heap != Heap::Unknown);
+        assert(heap != HeapType::Unknown);
 
         D3D12_RESOURCE_DESC desc{};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -73,22 +67,22 @@ namespace CG::DX12 {
         desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
         desc.Flags = static_cast<D3D12_RESOURCE_FLAGS>(flag);
 
-        Initialize(device, heap, desc, initialResourceState);
+        Initialize(device, heap, desc, initialState);
     }
 
     void Resource::InitializeForTexture2D(
         const Device& device,
-        Heap heap,
         uint64_t width,
         uint32_t height,
         uint8_t depthOrArraySize,
         uint8_t mipLevels,
         DXGI_FORMAT format,
-        D3D12_RESOURCE_STATES initialResourceState,
+        State initialState,
+        HeapType heap,
         Flag flag,
         const float* clearColor) {
         assert(device.IsEnabled());
-        assert(heap != Heap::Unknown);
+        assert(heap != HeapType::Unknown);
 
         D3D12_RESOURCE_DESC desc{};
         desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -116,17 +110,17 @@ namespace CG::DX12 {
             clearValue.DepthStencil.Depth = 1.0f;
             clearValue.DepthStencil.Stencil = 0;
         }
-        Initialize(device, heap, desc, initialResourceState, cvptr);
+        Initialize(device, heap, desc, initialState, cvptr);
     }
 
-    D3D12_RESOURCE_BARRIER Resource::TransitionBarrier(D3D12_RESOURCE_STATES afterState) {
+    D3D12_RESOURCE_BARRIER Resource::TransitionBarrier(State afterState) {
         assert(IsEnabled());
 
         D3D12_RESOURCE_BARRIER barrier{};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
         barrier.Transition.pResource = resource_.Get();
-        barrier.Transition.StateBefore = currentState_;
-        barrier.Transition.StateAfter = afterState;
+        barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(currentState_);
+        barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(afterState);
         currentState_ = afterState;
 
         return barrier;
@@ -134,7 +128,7 @@ namespace CG::DX12 {
 
     D3D12_RESOURCE_BARRIER Resource::UAVBarrier() {
         assert(IsEnabled());
-        assert(currentState_ == D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+        assert(currentState_ == State::UnorderedAccess);
 
         D3D12_RESOURCE_BARRIER barrier{};
         barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -145,7 +139,7 @@ namespace CG::DX12 {
 
     void* Resource::Map() {
         assert(IsEnabled());
-        assert(heap_ != Heap::Default);
+        assert(heap_ != HeapType::Default);
 
         void* mappedPtr = nullptr;
         resource_->Map(0, nullptr, &mappedPtr);
@@ -155,7 +149,7 @@ namespace CG::DX12 {
 
     void Resource::Unmap() {
         assert(IsEnabled());
-        assert(heap_ != Heap::Default);
+        assert(heap_ != HeapType::Default);
 
         resource_->Unmap(0, nullptr);
     }

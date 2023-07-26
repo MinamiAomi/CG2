@@ -19,8 +19,7 @@
 
 #include "Math/MathUtils.h"
 
-#include "CG_DX12.h"
-#include "ShaderCompiler.h"
+#include "DX12/DX12.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -165,7 +164,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     swapChain.Initialize(hwnd, device, commandQueue, rtvDescriptorHeap, kClientWidth, kClientHeight);
 
     CG::DX12::Resource resource;
-    resource.InitializeForBuffer(device, CG::DX12::Resource::Heap::Upload, 256);
+    resource.InitializeForBuffer(device, 256);
 
     CG::DX12::RootSignatureDesc rsDesc;
     rsDesc.AddDescriptor(CG::DX12::DescriptorType::CBV, 0, CG::DX12::ShaderVisibility::Vertex);
@@ -178,35 +177,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     CG::DX12::RootSignature rs;
     rs.Initialize(device, rsDesc);
 
-    ShaderCompiler shaderCompiler;
-    shaderCompiler.Initalize();
-    // シェーダーをコンパイル
-    Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler.Compile(L"Object3d.VS.hlsl", L"vs_6_0");
-    assert(vertexShaderBlob != nullptr);
-    Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler.Compile(L"Object3d.PS.hlsl", L"ps_6_0");
-    assert(pixelShaderBlob != nullptr);
-
-    CG::DX12::Shader vs;
-    vs.Initialize(reinterpret_cast<const char*>(vertexShaderBlob->GetBufferPointer()), vertexShaderBlob->GetBufferSize());
-    CG::DX12::Shader ps;
-    ps.Initialize(reinterpret_cast<const char*>(pixelShaderBlob->GetBufferPointer()), pixelShaderBlob->GetBufferSize());
+    CG::DX12::ShaderCompiler shaderCompiler;
+    shaderCompiler.Initialize();
+    auto vs = shaderCompiler.Compile("Object3d.VS.hlsl", L"vs_6_0");
+    auto ps = shaderCompiler.Compile("Object3d.PS.hlsl", L"ps_6_0");
 
     CG::DX12::GraphicsPipelineStateDesc gps;
-    CG::DX12::InputLayoutDesc ild;
-    ild.AddVertex("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
-    ild.AddVertex("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0);
-    ild.AddVertex("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
-
-    CG::DX12::BlendDesc bd;
-    bd.AddRenderTargetDesc(CG::DX12::BlendMode::None, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-
     gps.SetRootSignature(rs);
     gps.SetVertexShader(vs);
     gps.SetPixelShader(ps);
-    gps.SetInputLayout(ild);
+    gps.AddInputElementVertex("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
+    gps.AddInputElementVertex("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0);
+    gps.AddInputElementVertex("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
     gps.SetPrimitiveTopologyType(CG::DX12::PrimitiveTopology::Triangle);
-    gps.SetRasterizerState(CG::DX12::CullMode::Back, true);
-    gps.SetBlendDesc(bd);
+    gps.SetRasterizerState(CG::DX12::CullMode::Back, CG::DX12::FillMode::Solid);
+    gps.AddRenderTargetState(CG::DX12::BlendMode::Normal, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+    gps.SetSampleState();
 
 
     CG::DX12::PipelineState pso;
@@ -599,7 +585,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             else {
                 auto cmdList = commandList.GetCommandList();
 
-                auto barrier = swapChain.GetCurrentResource().TransitionBarrier(D3D12_RESOURCE_STATE_RENDER_TARGET);
+                auto barrier = swapChain.GetCurrentResource().TransitionBarrier(CG::DX12::Resource::State::RenderTarget);
                 cmdList->ResourceBarrier(1, &barrier);
                 auto rtvHandle = swapChain.GetCurrentRenderTargetView().GetDescriptor().GetCPUHandle();
                 cmdList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
@@ -607,7 +593,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 cmdList->ClearRenderTargetView(rtvHandle, cc, 0, nullptr);
 
 
-                barrier = swapChain.GetCurrentResource().TransitionBarrier(D3D12_RESOURCE_STATE_PRESENT);
+                barrier = swapChain.GetCurrentResource().TransitionBarrier(CG::DX12::Resource::State::Present);
                 cmdList->ResourceBarrier(1, &barrier);
 
 
