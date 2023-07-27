@@ -1,32 +1,29 @@
 #pragma once
+#include "Resource.h"
+
+#include <memory>
+#include <vector>
 
 #include "DX12/DX12.h"
 #include "Math/MathUtils.h"
 
 namespace CG {
 
-    enum class Format {
-        UInt16,
-        UInt32
-    };
+    class Material;
 
-    class Mesh {
+    class Mesh : public Resource {
     public:
+        void SetVertices(void* vertices, size_t vertexCount, size_t stride);
+        void AddIndices(void* indices, size_t indexCount, size_t stride, Material* material);
 
-        class Vertex {
-            Vector3 position;
-            Vector2 texcoord;
-            Vector3 normal;
-            Vector3 tangent;
-        };
-        void SetVertices(const std::vector<Vertex>& vertices);
+        DX12::VertexBuffer& GetVertexBuffer() { return vertexBuffer_; }
+        std::vector<std::unique_ptr<DX12::IndexBuffer>>& GetIndexBuffers() { return indexBuffers_; }
+        std::vector<Material*>& GetMaterials() { return materials_; }
 
     private:
-        std::vector<Vertex> vertices;
-        void* indices;
-        std::vector<uint32_t> indices;
-
-
+        DX12::VertexBuffer vertexBuffer_;
+        std::vector<std::unique_ptr<DX12::IndexBuffer>> indexBuffers_;
+        std::vector<Material*> materials_;
     };
 
 }

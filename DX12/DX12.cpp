@@ -1,5 +1,9 @@
 #include "DX12.h"
 
+#pragma comment(lib,"d3d12.lib")
+#pragma comment(lib,"dxgi.lib")
+#pragma comment(lib,"dxguid.lib")
+
 namespace CG::DX12 {
 
     void DynamicBuffer::Initialize(const Device& device, size_t bufferSize, bool allowUnorderedAccess, CG::DX12::Resource::State initialState) {

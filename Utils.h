@@ -1,21 +1,12 @@
 #pragma once
 
-#include <cstdint>
+#include <string>
 
 namespace CG {
 
-    struct Sizef {
-        float width;
-        float height;
-
-        Sizef Half() const { return { width * 0.5f, height * 0.5f }; }
-    };
-
-    struct Sizeui {
-        uint32_t width;
-        uint32_t height;
-
-        Sizeui Half() const { return { width / 2, height / 2 }; }
-    };
+    // wstringに変換
+    std::wstring ConvertString(const std::string& str);
+    // wstringから変換
+    std::string ConvertString(const std::wstring& str);
 
 }

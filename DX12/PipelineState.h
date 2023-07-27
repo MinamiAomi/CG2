@@ -71,7 +71,7 @@ namespace CG::DX12 {
         void Clear();
         
     private:
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC desc_;
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC desc_{};
         uint32_t renderTargetCount_{ 0 };
         std::vector<D3D12_INPUT_ELEMENT_DESC> inputElements_;
         std::vector<std::string> semanticNames_;
@@ -84,7 +84,7 @@ namespace CG::DX12 {
         void SetRootSignature(const RootSignature& rootSignature);
         void SetComputeShader(const Shader& shader);
     private:
-        D3D12_COMPUTE_PIPELINE_STATE_DESC desc_;
+        D3D12_COMPUTE_PIPELINE_STATE_DESC desc_{};
     };
 
     class PipelineState {

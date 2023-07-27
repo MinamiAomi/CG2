@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 
+
 #include "Externals/ImGui/imgui.h"
 #include "Externals/ImGui/imgui_impl_dx12.h"
 #include "Externals/ImGui/imgui_impl_win32.h"
@@ -21,9 +22,9 @@
 
 #include "DX12/DX12.h"
 
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"dxguid.lib")
+#include "Window.h"
+#include "GraphicsEngine.h"
+#include "GUI.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -109,6 +110,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     CG::DX12::D3DResourceLeakChecker leakChecker;
+
+    CG::Window window;
+    window.Initialize("Game", 1280, 720);
 
     if (FAILED(CoInitializeEx(0, COINIT_MULTITHREADED))) {
         assert(false);
@@ -198,6 +202,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     CG::DX12::PipelineState pso;
     pso.Initialize(device, gps);
 
+    {
+        CG::Window window;
+        window.Initialize("Game", 1280, 720);
+
+        CG::GraphicsEngine graphicsEngine;
+        graphicsEngine.Initialize(&window);
+
+        CG::GUI gui;
+        gui.Initialize(window, graphicsEngine);
+
+        while (window.ProcessMessage()) {
+            gui.NewFrame();
+
+
+        }
+
+        gui.Finalize();
+        window.Finalize();
+    }
 
     //    Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource{ nullptr };
     //    Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap{ nullptr };

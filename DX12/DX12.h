@@ -4,6 +4,8 @@
 #include <dxgidebug.h>
 #include <wrl/client.h>
 
+#include <cstdint>
+
 #include "Device.h"
 #include "CommandQueue.h"
 #include "SwapChain.h"
@@ -32,21 +34,74 @@ namespace CG::DX12 {
         }
     };
 
+    struct Viewport : public D3D12_VIEWPORT {
+        Viewport() = default;
+        explicit Viewport(const D3D12_VIEWPORT& viewport) noexcept : D3D12_VIEWPORT(viewport) {}
+        explicit Viewport(
+            float topLeftX,
+            float topLeftY,
+            float width,
+            float height,
+            float minDepth = D3D12_MIN_DEPTH,
+            float maxDepth = D3D12_MAX_DEPTH) noexcept {
+            TopLeftX = topLeftX;
+            TopLeftY = topLeftY;
+            Width = width;
+            Height = height;
+            MinDepth = minDepth;
+            MaxDepth = maxDepth;
+        }
+        explicit Viewport(float width, float height) noexcept : Viewport(0.0f, 0.0f, width, height) {}
+    };
+
+    struct ScissorRect : public D3D12_RECT {
+        ScissorRect() = default;
+        explicit ScissorRect(const D3D12_RECT& rect) noexcept : D3D12_RECT(rect) {}
+        explicit ScissorRect(
+            LONG Left,
+            LONG Top,
+            LONG Right,
+            LONG Bottom) noexcept {
+            left = Left;
+            top = Top;
+            right = Right;
+            bottom = Bottom;
+        }
+        explicit ScissorRect(const Viewport& viewport) :
+            ScissorRect(
+                static_cast<LONG>(viewport.TopLeftX),
+                static_cast<LONG>(viewport.TopLeftY),
+                static_cast<LONG>(viewport.TopLeftX + viewport.Width),
+                static_cast<LONG>(viewport.TopLeftY + viewport.Height)) {
+
+        }
+    };
+
     class DynamicBuffer {
     public:
         void Initialize(const Device& device, size_t bufferSize, bool allowUnorderedAccess = false, CG::DX12::Resource::State initialState = CG::DX12::Resource::State::GenericRead);
-        
+
         Resource& GetResource() { return resource_; }
         const Resource& GetResource() const { return resource_; }
         size_t GetBufferSize() const { return bufferSize_; }
         template<class T>
         T* GetDataBegin() const { return reinterpret_cast<T*>(dataBegin_); }
         void* GetDataBegin() const { return dataBegin_; }
-    
+
     private:
         Resource resource_;
         size_t bufferSize_{ 0 };
         void* dataBegin_{ nullptr };
+    };
+
+    struct VertexBuffer {
+        Resource resource;
+        VertexBufferView view;
+    };
+
+    struct IndexBuffer {
+        Resource resource;
+        IndexBufferView view;
     };
 
     struct RenderTargetResource {
@@ -63,4 +118,5 @@ namespace CG::DX12 {
         Resource resource;
         ShaderResourceView view;
     };
+
 }
