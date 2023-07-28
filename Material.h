@@ -11,6 +11,8 @@ namespace CG {
     class Material : public Resource {
     public:
 
+
+
     private:
         DX12::Resource constantBuffer_;
         Texture* texture_;

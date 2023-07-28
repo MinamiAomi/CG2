@@ -19,6 +19,7 @@
 #include "PipelineState.h"
 #include "Shader.h"
 #include "ShaderCompiler.h"
+#include "Texture.h"
 
 namespace CG::DX12 {
 
@@ -112,11 +113,6 @@ namespace CG::DX12 {
     struct DepthStencilResource {
         Resource resource;
         DepthStencilView view;
-    };
-
-    struct TextureResource {
-        Resource resource;
-        ShaderResourceView view;
     };
 
 }

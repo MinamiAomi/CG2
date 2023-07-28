@@ -1,74 +1,49 @@
 #pragma once
 
-#include <d3d12.h>
-
 #include <string>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
+#include "DX12/DX12.h"
 #include "Math/MathUtils.h"
 
-class Model {
-public:
-    class Object {
-    public:
-        Object(const Object&) = delete;
-        const Object& operator=(const Object&) = delete;
-        ~Object();
+namespace CG {
 
-        void Draw();
+    class Model {
+    public:
+        void LoadFromObj(const std::string& directioryPath, const std::string& fileName);
 
     private:
-        Object();
+        struct Vertex {
+            Vector3 position;
+            Vector3 normal;
+            Vector2 texcoord;
+        };
+        struct Texture {
+            std::string filepath;
+            DX12::Texture texture;
+        };
+        struct Material {
+            Vector4 color;
+            DX12::Resource buffer;
+            Texture* texture_;
+        };
+        struct Mesh {
+            std::vector<Vertex> vertices;
+            std::vector<std::vector<uint32_t>> indicesList;
+            DX12::VertexBuffer vertexBuffer;
+            std::vector<std::unique_ptr<DX12::IndexBuffer>> indexBuffers;
+            std::vector<Material*> materials_;
+        };
 
-        const Model* model_ = nullptr;
-        ID3D12Resource* transformationResource_ = nullptr;
+        void LoadOBJFile(const std::string& directioryPath, const std::string& fileName);
+        void LoadMTLFile(const std::string& directioryPath, const std::string& fileName);
+        void LoadResource(const DX12::Device& device, DX12::CommandQueue& commandQueue);
 
-        Vector3 translate_;
-        Vector3 rotate_;
-        Vector3 scale_;
-        Matrix4x4 worldMatrix_;
-
-        friend class Model;
-    };
-
-    void LoadFromObj(const std::string& directioryPath, const std::string& fileName);
-    std::shared_ptr<Object> CreateObject();
-
-private:
-    struct VertexData {
-        Vector4 position;
-        Vector2 texcoord;
-        Vector3 normal;
-    };
-
-    struct Material {
-        const std::string name;
-        std::string textureFilePath;
-        Vector4 color;
-        ID3D12Resource* materialResource = nullptr;
-        ID3D12Resource* textureResource = nullptr;
-        D3D12_CPU_DESCRIPTOR_HANDLE textureCPUHandle = {};
-        D3D12_GPU_DESCRIPTOR_HANDLE textureGPUHandle = {};
-
-        explicit Material(const std::string& name) : name(name) {};
-        ~Material();
-    };
-    struct Mesh {
-        const std::string name;
-        std::vector<VertexData> vertices;
-        size_t materialIndex = 0;
-        ID3D12Resource* vertexResource = nullptr;
-
-        explicit Mesh(const std::string& name) : name(name) {};
-        ~Mesh();
-    };
-
-    void LoadObjFile(const std::string& directioryPath, const std::string& fileName);
-    void LoadMaterialTemplateFile(const std::string& directioryPath, const std::string& fileName);
-    void CreateModelResource();
-
-    std::string name_;
-    std::vector<Mesh> meshes_;
-    std::vector<Material> materials_;
-};
+        std::string name_;
+        std::unordered_map<std::string, std::unique_ptr<Mesh>> meshMap_;
+        std::unordered_map<std::string, std::unique_ptr<Material>> materialMap_;
+        std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap_;
+    }
+}

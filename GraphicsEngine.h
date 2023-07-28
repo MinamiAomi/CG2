@@ -46,9 +46,6 @@ namespace CG {
         DX12::SwapChain swapChain_;
         DX12::Viewport viewport_;
         DX12::ScissorRect scissorRect_;
-
-        
-
     };
 
 }

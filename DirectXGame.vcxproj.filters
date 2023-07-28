@@ -129,8 +129,8 @@
     <ClCompile Include="ObjLoader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceContainer.cpp">
-      <Filter>EngineSystem</Filter>
+    <ClCompile Include="DX12\Texture.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -242,17 +242,17 @@
     <ClInclude Include="Material.h">
       <Filter>EngineSystem</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceContainer.h">
-      <Filter>EngineSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>EngineSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>EngineSystem</Filter>
+    <ClInclude Include="Renderer.h">
+      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>EngineSystem</Filter>
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Texture.h">
+      <Filter>DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
