@@ -40,13 +40,13 @@ namespace CG::DX12 {
             reinterpret_cast<IDXGISwapChain1**>(swapChain_.ReleaseAndGetAddressOf())))) {
             assert(false);
         }
-
+        rtvFormat_ = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         for (uint32_t i = 0; i < kBackBufferCount; ++i) {
             ComPtr<ID3D12Resource> resource;
             swapChain_->GetBuffer(i, IID_PPV_ARGS(resource.GetAddressOf()));
             resources_[i].InitializeForResource(resource);
 
-            renderTargetViews_[i].Initialize(device, resources_[i], descriptorHeap.Allocate(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+            renderTargetViews_[i].Initialize(device, resources_[i], descriptorHeap.Allocate(), rtvFormat_);
         }
         currentBackBufferIndex_ = swapChain_->GetCurrentBackBufferIndex();
     }

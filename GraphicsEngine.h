@@ -2,8 +2,6 @@
 
 #include "DX12/DX12.h"
 #include "Window.h"
-#include "GUI.h"
-#include "ResourceContainer.h"
 
 namespace CG {
 
@@ -12,10 +10,9 @@ namespace CG {
     class GraphicsEngine {
     public:
         void Initialize(const Window* targetWindow);
-        
         DX12::CommandList& PreDraw();
-        void PostDraw();
-
+        void PostDraw(DX12::CommandList& commandList);
+        
         const Window* GetWindow() const { return window_; }
         DX12::Device& GetDevice() { return device_; }
         DX12::CommandQueue& GetCommandQueue() { return commandQueue_; }
@@ -44,6 +41,7 @@ namespace CG {
         DX12::DescriptorHeap srvDescriptorHeap_;
 
         DX12::SwapChain swapChain_;
+        DX12::DepthStencilResource depthStencilResource;
         DX12::Viewport viewport_;
         DX12::ScissorRect scissorRect_;
     };

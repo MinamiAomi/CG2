@@ -110,9 +110,17 @@ namespace CG::DX12 {
         RenderTargetView view;
     };
 
-    struct DepthStencilResource {
-        Resource resource;
-        DepthStencilView view;
+    class DepthStencilResource {
+    public:
+        void Initialize(const Device& device, DescriptorHeap& descriptorHeap, uint32_t width, uint32_t height);
+        
+        Resource& GetResource() { return resource_; }
+        const Resource& GetResource() const { return resource_; }
+        D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return view_.GetDescriptor().GetCPUHandle(); }
+
+    private:
+        Resource resource_;
+        DepthStencilView view_;
     };
 
 }

@@ -5,15 +5,17 @@
 #include <sstream>
 #include <filesystem>
 
+#include "Utils.h"
+#include "GraphicsEngine.h"
+
 namespace CG {
 
-    void Model::LoadFromObj(const std::string& directioryPath, const std::string& fileName) {
-        meshes_.clear();
-        materials_.clear();
-        std::filesystem::path filePath(directioryPath + "/" + fileName);
-        assert(filePath.extension() == ".obj");
-        name_ = filePath.stem().string();
+    void Model::LoadFromObj(GraphicsEngine& graphicsEngine, const std::string& directioryPath, const std::string& fileName) {
+        meshMap_.clear();
+        materialMap_.clear();
+        name_ = fileName;
         LoadOBJFile(directioryPath, fileName);
+        LoadResource(graphicsEngine);
 
     }
 
@@ -156,23 +158,45 @@ namespace CG {
         }
     }
 
-    void Model::LoadResource(const DX12::Device& device, DX12::CommandQueue& commandQueue) {
+    void Model::LoadResource(GraphicsEngine& graphicsEngine) {
         size_t vertexStrideSize = sizeof(Vertex);
         size_t indexStrideSize = sizeof(uint32_t);
 
         for (auto& iter : meshMap_) {
             auto& mesh = iter.second;
-            size_t vertexBufferSize = mesh->vertices.size() * vertexStrideSize;
-            mesh->vertexBuffer.resource.InitializeForBuffer(device, vertexBufferSize);
+            auto& vertexBuffer = mesh->vertexBuffer;
+            auto& vertices = mesh->vertices;
+            size_t vertexBufferSize = vertices.size() * vertexStrideSize;
+            vertexBuffer.resource.InitializeForBuffer(graphicsEngine.GetDevice(), vertexBufferSize);
             void* vertexData = nullptr;
-            vertexData = mesh->vertexBuffer.resource.Map();
-            memcpy(vertexData, mesh->vertices.data(), vertexBufferSize);
-            mesh->vertexBuffer.resource.Unmap();
+            vertexData = vertexBuffer.resource.Map();
+            memcpy(vertexData, vertices.data(), vertexBufferSize);
+            vertexBuffer.resource.Unmap();
+            vertexBuffer.view.Initialize(vertexBuffer.resource, vertexBufferSize, vertexStrideSize, vertices.size());
 
             for (size_t indexIndex = 0; indexIndex < mesh->indicesList.size(); ++indexIndex) {
-                size_t indexBufferSize = mesh->indicesList[indexIndex].size() * indexBufferSize;
-                mesh->indexBuffers[indexIndex]->resource.InitializeForBuffer(device, indexBufferSize);
+                auto& indexBuffer = mesh->indexBuffers.emplace_back();
+                indexBuffer = std::make_unique<CG::DX12::IndexBuffer>();
+                auto& indices = mesh->indicesList[indexIndex];
+                size_t indexBufferSize = indices.size() * indexStrideSize;
+                indexBuffer->resource.InitializeForBuffer(graphicsEngine.GetDevice(), indexBufferSize);
+                void* indexData = nullptr;
+                indexData = indexBuffer->resource.Map();
+                memcpy(indexData, mesh->indicesList[indexIndex].data(), indexBufferSize);
+                indexBuffer->resource.Unmap();
+                indexBuffer->view.Initialize(indexBuffer->resource, indexBufferSize, indices.size());
             }
+        }
+
+        for (auto& iter : materialMap_) {
+            auto& material = iter.second;
+            material->buffer.InitializeForBuffer(graphicsEngine.GetDevice(), sizeof(Vector4));
+        }
+
+        for (auto& iter : textureMap_) {
+            auto& texture = iter.second;
+            texture->texture.InitializeFromPNG(graphicsEngine.GetDevice(), graphicsEngine.GetCommandQueue(), ConvertString(texture->filepath));
+            texture->srv.InitializeTexture2D(graphicsEngine.GetDevice(), texture->texture.GetResource(), graphicsEngine.GetSRVDescriptorHeap().Allocate());
         }
 
     }

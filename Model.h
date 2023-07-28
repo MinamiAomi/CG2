@@ -7,12 +7,13 @@
 
 #include "DX12/DX12.h"
 #include "Math/MathUtils.h"
+#include "GraphicsEngine.h"
 
 namespace CG {
 
     class Model {
     public:
-        void LoadFromObj(const std::string& directioryPath, const std::string& fileName);
+        void LoadFromObj(GraphicsEngine& graphicsEngine, const std::string& directioryPath, const std::string& fileName);
 
     private:
         struct Vertex {
@@ -23,6 +24,7 @@ namespace CG {
         struct Texture {
             std::string filepath;
             DX12::Texture texture;
+            DX12::ShaderResourceView srv;
         };
         struct Material {
             Vector4 color;
@@ -39,11 +41,11 @@ namespace CG {
 
         void LoadOBJFile(const std::string& directioryPath, const std::string& fileName);
         void LoadMTLFile(const std::string& directioryPath, const std::string& fileName);
-        void LoadResource(const DX12::Device& device, DX12::CommandQueue& commandQueue);
+        void LoadResource(GraphicsEngine& graphicsEngine);
 
         std::string name_;
         std::unordered_map<std::string, std::unique_ptr<Mesh>> meshMap_;
         std::unordered_map<std::string, std::unique_ptr<Material>> materialMap_;
         std::unordered_map<std::string, std::unique_ptr<Texture>> textureMap_;
-    }
+    };
 }

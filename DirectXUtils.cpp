@@ -1,6 +1,6 @@
 #include "DirectXUtils.h"
 
-#include "StringUtils.h"
+#include "Utils.h"
 
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, size_t sizeInBytes) {
     // アップロードヒープ
@@ -43,7 +43,7 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(Microsoft::WRL
 
 DirectX::ScratchImage LoadTexture(const std::string& filePath) {
     DirectX::ScratchImage image{};
-    std::wstring filePathW = ConvertString(filePath);
+    std::wstring filePathW = CG::ConvertString(filePath);
     HRESULT hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
     assert(SUCCEEDED(hr));
 

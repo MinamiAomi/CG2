@@ -35,12 +35,14 @@ namespace CG::DX12 {
         RenderTargetView& GetCorrentRenderTargetView() { return renderTargetViews_[currentBackBufferIndex_]; }
         const RenderTargetView& GetCurrentRenderTargetView() const { return renderTargetViews_[currentBackBufferIndex_]; }
         uint32_t GetCurrentBackBufferIndex() { return currentBackBufferIndex_; }
+        DXGI_FORMAT GetRTVFormat() const { return rtvFormat_; }
 
     private:
         ComPtr<IDXGISwapChain4> swapChain_;
         Resource resources_[kBackBufferCount];
         RenderTargetView renderTargetViews_[kBackBufferCount];
         uint32_t currentBackBufferIndex_{ 0 };
+        DXGI_FORMAT rtvFormat_;
     };
 
 }

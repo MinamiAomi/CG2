@@ -5,7 +5,8 @@
 #include "Utils.h"
 
 #ifdef _DEBUG
-#include "GUI.h"
+#include "Externals/ImGui/imgui_impl_win32.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif // _DEBUG
 
 namespace CG {
@@ -14,7 +15,7 @@ namespace CG {
     LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 #ifdef _DEBUG
-        if (GUI::WindowProc(hwnd, msg, wparam, lparam)) { return true; }
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) { return true; }
 #endif // _DEBUG
 
             // メッセージに対してゲーム固有の処理を行う
@@ -70,8 +71,8 @@ namespace CG {
 
     bool Window::ProcessMessage() const {
         MSG msg{};
-        bool isQuit = false;
-        while (isQuit = (msg.message != WM_QUIT)) {
+
+        while (msg.message != WM_QUIT) {
             if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
@@ -80,7 +81,7 @@ namespace CG {
                 break;
             }
         }
-        return isQuit;
+        return msg.message != WM_QUIT;
     }
 
     void Window::Finalize() {
