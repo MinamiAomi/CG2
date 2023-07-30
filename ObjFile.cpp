@@ -99,6 +99,13 @@ namespace CG {
             vertices[j + 2].normal = normal[i];
             vertices[j + 3].normal = normal[i];
         }
+        for (size_t i = 0; i < kSurfaceCount; i++) {
+            size_t j = i * 4;
+            vertices[j + 0].texcoord = {0.0f,0.0f};
+            vertices[j + 1].texcoord = {0.0f,1.0f};
+            vertices[j + 2].texcoord = {1.0f,0.0f};
+            vertices[j + 3].texcoord = {1.0f,1.0f};
+        }
         // インデックス
         for (uint32_t i = 0, j = 0; j < kSurfaceCount; j++) {
             uint32_t k = j * 4;
@@ -141,6 +148,14 @@ namespace CG {
                 { std::cos(lat) * std::sin(lon) }
             };
         };
+        auto CalcTexcoord = [&](size_t latIndex, size_t lonIndex) {
+            return Vector2{
+                float(lonIndex) / float(subdivision),
+                1.0f - float(latIndex) / float(subdivision)
+            };
+        };
+
+
         // 頂点
         for (uint32_t latIndex = 0; latIndex < kLonVertexCount; ++latIndex) {
             float lat = -Math::HalfPi + float(kLatEvery) * latIndex;
@@ -150,6 +165,7 @@ namespace CG {
 
                 uint32_t vertexIndex = latIndex * kLatVertexCount + lonIndex;
                 vertices[vertexIndex].position = CalcPosition(lat, lon) * radius;
+                vertices[vertexIndex].texcoord = CalcTexcoord(latIndex, lonIndex);
                 vertices[vertexIndex].normal = static_cast<Vector3>(vertices[vertexIndex].position);
             }
         }
