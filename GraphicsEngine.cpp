@@ -35,7 +35,7 @@ namespace CG {
         auto rtv = swapChain_.GetCorrentRenderTargetView().GetDescriptor().GetCPUHandle();
         auto dsv = depthStencilResource.GetCPUHandle();
         cmdList->OMSetRenderTargets(1, &rtv, 0, &dsv);
-        float clearColor[4] = { 0.2f,0.2f,0.2f,1.0f };
+        float clearColor[4] = { 0.1f,0.3f,0.5f,1.0f };
         cmdList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
         cmdList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 

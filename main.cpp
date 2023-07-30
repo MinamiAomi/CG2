@@ -73,6 +73,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         std::string previewObj;
         std::vector<std::unique_ptr<CG::Object>> objects;
+        {
+            std::unique_ptr<CG::Object> object = std::make_unique<CG::Object>();
+            object->translate = { 0.0f,-1.0f,0.0f };
+            object->scale = { 100.0f,1.0f,100.0f };
+            object->Initialize(objMap["cube"].get());
+            objects.emplace_back(std::move(object));
+        }
+
 
         DirectionalLightConstantData light{};
         light.color = Vector4::one;
@@ -93,6 +101,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             // 
             {
+                ImGui::Begin("Light");
+                ImGui::ColorEdit4("Color", &light.color.x);
+                ImGui::DragFloat3("Direction", &light.direction.x, 0.01f);
+                light.direction.Normalize();
+                ImGui::DragFloat("Intensity", &light.intensity, 0.01f);
+                ImGui::End();
+
                 ImGui::Begin("Setting");
                 char buf[256] = {};
                 memcpy(buf, directory.data(), std::max(directory.size(), 256ull));
@@ -149,6 +164,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
             graphicsEngine->PreDraw();
             auto& commandList = graphicsEngine->GetCommandList();
+            memcpy(lightBuffer.GetDataBegin(), &light, sizeof(light));
             CG::Material::DrawSetting(commandList, lightBuffer.GetResource().GetGPUVirtualAddress());
 
             for (auto& object : objects) {
