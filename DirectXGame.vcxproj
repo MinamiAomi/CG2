@@ -154,7 +154,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\ImGui\imstb_truetype.h" />
     <ClInclude Include="GraphicsEngine.h" />
     <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="Input.hpp" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Math\MathUtils.h" />
     <ClInclude Include="MeshResource.h" />

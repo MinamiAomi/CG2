@@ -13,7 +13,7 @@
 #include "ImGuiManager.h"
 #include "TextureManager.h"
 #include "ObjFile.h"
-#include "Input.hpp"
+#include "Input.h"
 #include "Material.h"
 #include "Camera.h"
 #include "Object.h"
@@ -36,8 +36,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         CG::TextureManager* textureManager = CG::TextureManager::GetInstance();
         textureManager->Initialize(graphicsEngine);
+        textureManager->LoadTexture("Resources/white.png");
 
-        Input::Initialize(window->GetHWND());
+        CG::Input::Initialize(window->GetHWND());
 
         CG::ImGuiManager* imguiManager = CG::ImGuiManager::GetInstance();
         imguiManager->Initialize(window, graphicsEngine);
@@ -56,8 +57,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 objMap[filename] = std::move(object);
             }
         };
+        {
+            objMap["cube"] = std::make_unique<CG::ObjFile>();
+            objMap["cube"]->CreateCube({ 1,1,1 });
+            objMap["sphere"] = std::make_unique<CG::ObjFile>();
+            objMap["sphere"]->CreateSphere(1.0f, 16);
+        }
         LoadObj("axis.obj");
         LoadObj("bunny.obj");
+        LoadObj("teapot.obj");
         LoadObj("suzanne.obj");
         LoadObj("multiMesh.obj");
         LoadObj("multiMaterial.obj");
@@ -74,59 +82,63 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         lightBuffer.Initialize(graphicsEngine->GetDevice(), sizeof(light));
         memcpy(lightBuffer.GetDataBegin(), &light, sizeof(light));
 
-        Camera camera;
+        CG::Camera camera;
         camera.SetProjectionMatrix(45.0f * Math::ToRadian, float(window->GetClientWidth()) / window->GetClientHeight(), 0.1f, 1000.0f);
 
         window->Show();
 
         while (window->ProcessMessage()) {
-            Input::Update();
+            CG::Input::Update();
             imguiManager->NewFrame();
 
-            ImGui::Begin("Setting");
-            char buf[256] = {};
-            memcpy(buf, directory.data(), std::max(directory.size(), 256ull));
-            if (ImGui::InputText("Directory", buf, 256)) {
-                directory = buf;
-            }
-            memcpy(buf, loadFileName.data(), std::max(loadFileName.size(), 256ull));
-            if (ImGui::InputText("FileName", buf, 256)) {
-                loadFileName = buf;
-            }
-            if (ImGui::Button("Load")) {
-                LoadObj(loadFileName);
-                previewObj = loadFileName;
-            }
-            ImGui::Separator();
-            if (ImGui::BeginCombo("Model", previewObj.c_str())) {
-                for (auto& obj : objMap) {
-                    const bool isSelectabled = (obj.first == previewObj);
-                    if (ImGui::Selectable(obj.first.c_str(), &isSelectabled)) {
-                        previewObj = obj.first;
-                    }
-                    if (isSelectabled) {
-                        ImGui::SetItemDefaultFocus();
+            // 
+            {
+                ImGui::Begin("Setting");
+                char buf[256] = {};
+                memcpy(buf, directory.data(), std::max(directory.size(), 256ull));
+                if (ImGui::InputText("Directory", buf, 256)) {
+                    directory = buf;
+                }
+                memcpy(buf, loadFileName.data(), std::max(loadFileName.size(), 256ull));
+                if (ImGui::InputText("FileName", buf, 256)) {
+                    loadFileName = buf;
+                }
+                if (ImGui::Button("Load")) {
+                    if (std::filesystem::is_regular_file(directory + loadFileName)) {
+                        LoadObj(loadFileName);
+                        previewObj = loadFileName;
                     }
                 }
-                ImGui::EndCombo();
-            }
-
-            if (ImGui::Button("Create")) {
-                if (!previewObj.empty()) {
-                    std::unique_ptr<CG::Object> object = std::make_unique<CG::Object>();
-                    object->Initialize(objMap[previewObj].get());
-                    objects.emplace_back(std::move(object));
-                }
-            }
-
-
-            for (size_t i = 0; i < objects.size(); ++i) {
                 ImGui::Separator();
-                objects[i]->Edit("Object" + std::to_string(i));
+                if (ImGui::BeginCombo("Model", previewObj.c_str())) {
+                    for (auto& obj : objMap) {
+                        const bool isSelectabled = (obj.first == previewObj);
+                        if (ImGui::Selectable(obj.first.c_str(), &isSelectabled)) {
+                            previewObj = obj.first;
+                        }
+                        if (isSelectabled) {
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (ImGui::Button("Create")) {
+                    if (!previewObj.empty()) {
+                        std::unique_ptr<CG::Object> object = std::make_unique<CG::Object>();
+                        object->Initialize(objMap[previewObj].get());
+                        objects.emplace_back(std::move(object));
+                    }
+                }
+
+                for (size_t i = 0; i < objects.size(); ++i) {
+                    ImGui::Separator();
+                    objects[i]->Edit("Object" + std::to_string(i));
+                }
+
+                ImGui::End();
             }
 
-
-            ImGui::End();
 
             camera.Update();
 

@@ -2,23 +2,27 @@
 
 #include "Math/MathUtils.h"
 
-class Camera {
-public:
-    void Update();
+namespace CG {
 
-    void SetProjectionMatrix(float fovY, float aspectRaito, float nearZ, float farZ);
+    class Camera {
+    public:
+        void Update();
 
-    const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
-    const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
+        void SetProjectionMatrix(float fovY, float aspectRaito, float nearZ, float farZ);
 
-private:
-    Vector3 position_ = { 0.0f,1.0f,-6.0f };
-    Vector3 rotate_ = { 0,0,0 };
-    Matrix4x4 viewMatrix_;
+        const Matrix4x4& GetViewMatrix() const { return viewMatrix_; }
+        const Matrix4x4& GetProjectionMatrix() const { return projectionMatrix_; }
 
-    float fovY_;
-    float aspectRaito_;
-    float nearZ_;
-    float farZ_;
-    Matrix4x4 projectionMatrix_;
-};
+    private:
+        Vector3 position_ = { 0.0f,1.0f,-6.0f };
+        Vector3 rotate_ = { 0,0,0 };
+        Matrix4x4 viewMatrix_;
+
+        float fovY_;
+        float aspectRaito_;
+        float nearZ_;
+        float farZ_;
+        Matrix4x4 projectionMatrix_;
+    };
+
+}

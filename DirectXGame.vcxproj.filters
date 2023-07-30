@@ -11,14 +11,6 @@
     <Filter Include="Resource\Shader">
       <UniqueIdentifier>{5c5c7f06-12c8-42bd-acdb-15a558affb01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Source">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="DirectX">
       <UniqueIdentifier>{d70244df-b1f0-4d40-905b-953e102bc592}</UniqueIdentifier>
     </Filter>
@@ -30,9 +22,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Math\MathUtils.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -123,15 +112,16 @@
     <ClCompile Include="TextureManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -233,10 +223,10 @@
     <ClInclude Include="MeshResource.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Input.hpp">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>

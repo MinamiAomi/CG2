@@ -31,15 +31,16 @@ namespace CG {
             MeshResource meshResource;
             std::vector<Material*> materials;
         };
-
         static void StaticIntialize(GraphicsEngine* graphicsEngine);
 
         void LoadFromObj(const std::string& directioryPath, const std::string& fileName);
+        void CreateCube(const Vector3& size);
+        void CreateSphere(float radius, uint32_t subdivision);
 
         const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return meshes_; }
     private:
         static GraphicsEngine* graphicsEngine_;
-        
+
         void LoadOBJFile(const std::string& directioryPath, const std::string& fileName);
         void LoadMTLFile(const std::string& directioryPath, const std::string& fileName);
         void LoadResource(GraphicsEngine& graphicsEngine);
