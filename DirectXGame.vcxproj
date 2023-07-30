@@ -62,8 +62,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
-copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"
-</Command>
+copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -94,7 +93,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DirectXUtils.cpp" />
     <ClCompile Include="DX12\CommandList.cpp" />
     <ClCompile Include="DX12\CommandQueue.cpp" />
     <ClCompile Include="DX12\Descriptor.cpp" />
@@ -110,7 +108,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\SwapChain.cpp" />
     <ClCompile Include="DX12\Texture.cpp" />
     <ClCompile Include="DX12\Views.cpp" />
-    <ClCompile Include="Editer\EditerManager.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_draw.cpp" />
@@ -118,22 +115,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_tables.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsEngine.cpp" />
     <ClCompile Include="ImGuiManager.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="ObjLoader.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ObjFile.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="DirectXUtils.h" />
     <ClInclude Include="DX12\CommandList.h" />
     <ClInclude Include="DX12\CommandQueue.h" />
     <ClInclude Include="DX12\Descriptor.h" />
@@ -149,14 +144,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\SwapChain.h" />
     <ClInclude Include="DX12\Texture.h" />
     <ClInclude Include="DX12\Views.h" />
-    <ClInclude Include="Editer\ResourceView.h" />
-    <ClInclude Include="Editer\ConsoleView.h" />
-    <ClInclude Include="Editer\Editer.h" />
-    <ClInclude Include="Editer\EditerManager.h" />
-    <ClInclude Include="Editer\GameView.h" />
-    <ClInclude Include="Editer\HierarchyView.h" />
-    <ClInclude Include="Editer\InspectorView.h" />
-    <ClInclude Include="Editer\SceneView.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
     <ClInclude Include="Externals\ImGui\imgui_impl_dx12.h" />
@@ -167,13 +154,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Externals\ImGui\imstb_truetype.h" />
     <ClInclude Include="GraphicsEngine.h" />
     <ClInclude Include="ImGuiManager.h" />
-    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Input.hpp" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Math\MathUtils.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="ModelRenderer.h" />
-    <ClInclude Include="ObjLoader.h" />
-    <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="Scene.h" />
+    <ClInclude Include="MeshResource.h" />
+    <ClInclude Include="ObjFile.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -190,7 +177,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Object3D.PS.hlsl">
+    <None Include="NoneLighting.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -202,6 +189,24 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ProjectReference Include="Externals\DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
       <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LambertLighting.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HalfLambertLighting.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,4 @@
-#include "Model.h"
+#include "ObjFile.h"
 
 #include <cassert>
 #include <fstream>
@@ -11,15 +11,20 @@
 
 namespace CG {
 
-    void Model::LoadFromObj(GraphicsEngine& graphicsEngine, const std::string& directioryPath, const std::string& fileName) {
+    GraphicsEngine* ObjFile::graphicsEngine_ = nullptr;
+
+    void ObjFile::StaticIntialize(GraphicsEngine* graphicsEngine) {
+        graphicsEngine_ = graphicsEngine;
+    }
+    void ObjFile::LoadFromObj(const std::string& directioryPath, const std::string& fileName) {
         meshes_.clear();
         materials_.clear();
         name_ = fileName;
         LoadOBJFile(directioryPath, fileName);
-        LoadResource(graphicsEngine);
+        LoadResource(*graphicsEngine_);
     }
 
-    void Model::LoadOBJFile(const std::string& directioryPath, const std::string& fileName) {
+    void ObjFile::LoadOBJFile(const std::string& directioryPath, const std::string& fileName) {
         std::vector<Vector3> positions;
         std::vector<Vector3> normals;
         std::vector<Vector2> texcoords;
@@ -29,7 +34,7 @@ namespace CG {
 
         name_ = fileName;
         std::unordered_map<std::string, uint32_t> vertexDefinitionMap;
-        Mesh* currentMesh = nullptr;
+        size_t currentMeshIndex = 0;
 
         std::string line;
         while (std::getline(file, line)) {
@@ -51,20 +56,24 @@ namespace CG {
             else if (identifier == "o") {
                 std::string meshName;
                 iss >> meshName;
-                currentMesh = meshes_.emplace_back(std::make_unique<Mesh>()).get();
-                currentMesh->name = meshName;
+                meshes_.emplace_back(std::make_unique<Mesh>());
+                meshes_[currentMeshIndex]->name = meshName;
+                currentMeshIndex = meshes_.size() - 1;
             }
             else if (identifier == "v") {
                 Vector3& position = positions.emplace_back();
                 iss >> position.x >> position.y >> position.z;
+                position.z = -position.z;
             }
             else if (identifier == "vn") {
                 Vector3& normal = normals.emplace_back();
                 iss >> normal.x >> normal.y >> normal.z;
+                normal.z = -normal.z;
             }
             else if (identifier == "vt") {
                 Vector2& texcoord = texcoords.emplace_back();
                 iss >> texcoord.x >> texcoord.y;
+                texcoord.y = 1.0f - texcoord.y;
             }
             else if (identifier == "usemtl") {
                 std::string materialName;
@@ -73,8 +82,11 @@ namespace CG {
                 auto iter = std::find_if(materials_.begin(), materials_.end(),
                     [&](const auto& material) {return material->name == materialName; });
                 if (iter != materials_.end()) {
-                    currentMesh->materials_.emplace_back(iter->get());
-                    currentMesh->indicesList.emplace_back();
+                    if (meshes_.empty()) {
+                        meshes_.emplace_back(std::make_unique<Mesh>());
+                    }
+                    meshes_[currentMeshIndex]->materials.emplace_back(iter->get());
+                    meshes_[currentMeshIndex]->indicesList.emplace_back();
                 }
             }
             else if (identifier == "f") {
@@ -107,7 +119,7 @@ namespace CG {
                                 useElement[j] = true;
                             }
                         }
-                        auto& vertex = currentMesh->vertices.emplace_back();
+                        auto& vertex = meshes_[currentMeshIndex]->vertices.emplace_back();
                         vertex.position = positions[elementIndices[0]];
                         if (useElement[1]) {
                             vertex.texcoord = texcoords[elementIndices[1]];
@@ -115,25 +127,25 @@ namespace CG {
                         if (useElement[2]) {
                             vertex.normal = normals[elementIndices[2]];
                         }
-                        face[i] = vertexDefinitionMap[vertexDefinitions[i]] = static_cast<uint32_t>(currentMesh->vertices.size() - 1);
+                        face[i] = vertexDefinitionMap[vertexDefinitions[i]] = static_cast<uint32_t>(meshes_[currentMeshIndex]->vertices.size() - 1);
                     }
                 }
 
                 for (uint32_t i = 0; i < face.size() - 2; ++i) {
-                    auto& indices = currentMesh->indicesList.back();
-                    indices.emplace_back(face[0]);
-                    indices.emplace_back(face[i + 1]);
+                    auto& indices = meshes_[currentMeshIndex]->indicesList.back();
                     indices.emplace_back(face[i + 2]);
+                    indices.emplace_back(face[i + 1]);
+                    indices.emplace_back(face[0]);
                 }
             }
         }
     }
 
-    void Model::LoadMTLFile(const std::string& directioryPath, const std::string& fileName) {
+    void ObjFile::LoadMTLFile(const std::string& directioryPath, const std::string& fileName) {
         std::ifstream file(directioryPath + "/" + fileName);
         assert(file.is_open());
 
-        Material* currentMaterial = nullptr;
+        size_t currentMaterialIndex = 0;
 
         std::string line;
         while (std::getline(file, line)) {
@@ -148,29 +160,30 @@ namespace CG {
             else if (identifier == "newmtl") {
                 std::string materialName;
                 iss >> materialName;
-                currentMaterial = materials_.emplace_back(std::make_unique<Material>()).get();
-                currentMaterial->name = materialName;
+                materials_.emplace_back(std::make_unique<Material>());
+                currentMaterialIndex = materials_.size() - 1;
+                materials_[currentMaterialIndex]->name = materialName;
             }
             else if (identifier == "map_Kd") {
                 std::string textureName;
                 iss >> textureName;
-                currentMaterial->texturePath = directioryPath + "/" + textureName;
+                materials_[currentMaterialIndex]->texturePath = directioryPath + "/" + textureName;
             }
             else if (identifier == "Kd") {
-                Vector4& color = currentMaterial->color;
+                Vector4& color = materials_[currentMaterialIndex]->color;
                 iss >> color.x >> color.y >> color.z;
                 color.w = 1.0f;
             }
         }
     }
 
-    void Model::LoadResource(GraphicsEngine& graphicsEngine) {
+    void ObjFile::LoadResource(GraphicsEngine& graphicsEngine) {
         size_t vertexStrideSize = sizeof(Vertex);
         size_t indexStrideSize = sizeof(uint32_t);
 
         for (auto& iter : meshes_) {
             auto& mesh = *iter;
-            auto& vertexBuffer = mesh.vertexBuffer;
+            auto& vertexBuffer = mesh.meshResource.vertexBuffer_;
             auto& vertices = mesh.vertices;
             size_t vertexBufferSize = vertices.size() * vertexStrideSize;
             vertexBuffer.resource.InitializeForBuffer(graphicsEngine.GetDevice(), vertexBufferSize);
@@ -181,7 +194,7 @@ namespace CG {
             vertexBuffer.view.Initialize(vertexBuffer.resource, vertexBufferSize, vertexStrideSize, vertices.size());
 
             for (size_t indexIndex = 0; indexIndex < mesh.indicesList.size(); ++indexIndex) {
-                auto& indexBuffer = mesh.indexBuffers.emplace_back();
+                auto& indexBuffer = mesh.meshResource.indexBuffers_.emplace_back();
                 indexBuffer = std::make_unique<CG::DX12::IndexBuffer>();
                 auto& indices = mesh.indicesList[indexIndex];
                 size_t indexBufferSize = indices.size() * indexStrideSize;

@@ -11,12 +11,18 @@ namespace CG {
 
     class ImGuiManager {
     public:
-        void Initialize(const Window& window, GraphicsEngine& graphicsEngine);
+        static ImGuiManager* GetInstance();
+
+        void Initialize(Window* window, GraphicsEngine* graphicsEngine);
         void NewFrame();
         void Render(DX12::CommandList& commandList);
         void Finalize();
 
     private:
+        ImGuiManager() = default;
+        ImGuiManager(const ImGuiManager&) = delete;
+        const ImGuiManager& operator=(const ImGuiManager&) = delete;
+
         DX12::Descriptor descriptor_;
     };
 

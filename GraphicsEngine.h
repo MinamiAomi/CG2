@@ -9,14 +9,16 @@ namespace CG {
 
     class GraphicsEngine {
     public:
+        static GraphicsEngine* GetInstance();
+
         void Initialize(const Window* targetWindow);
-        DX12::CommandList& PreDraw();
-        void PostDraw(DX12::CommandList& commandList);
+        void PreDraw();
+        void PostDraw();
         
         const Window* GetWindow() const { return window_; }
         DX12::Device& GetDevice() { return device_; }
         DX12::CommandQueue& GetCommandQueue() { return commandQueue_; }
-        DX12::CommandList& GetCommandList() { return commandLists_[swapChain_.GetCurrentBackBufferIndex()]; }
+        DX12::CommandList& GetCommandList() { return commandList_; }
         DX12::Fence& GetFence() { return fence_; }
         DX12::DescriptorHeap& GetRTVDescriptorHeap() { return rtvDescriptorHeap_; }
         DX12::DescriptorHeap& GetDSVDescriptorHeap() { return dsvDescriptorHeap_; }
@@ -24,6 +26,10 @@ namespace CG {
         DX12::SwapChain& GetSwapChain() { return swapChain_; }
 
     private:
+        GraphicsEngine() = default;
+        GraphicsEngine(const GraphicsEngine&) = delete;
+        const GraphicsEngine& operator=(const GraphicsEngine&) = delete;
+
         static const uint32_t kRTVDescriptorHeapSize = 16;
         static const uint32_t kDSVDescriptorHeapSize = 8;
         static const uint32_t kSRVDescriptorHeapSize = 1024;
@@ -33,7 +39,7 @@ namespace CG {
         DX12::Device device_;
 
         DX12::CommandQueue commandQueue_;
-        DX12::CommandList commandLists_[DX12::SwapChain::kBackBufferCount];
+        DX12::CommandList commandList_;
         DX12::Fence fence_;
 
         DX12::DescriptorHeap rtvDescriptorHeap_;

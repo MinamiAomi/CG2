@@ -8,6 +8,8 @@ namespace CG {
 
     class Window {
     public:
+        static Window* GetInstance();
+
         void Initialize(const std::string& name, uint32_t clientWidth, uint32_t clientHeight);
         void Show();
         bool ProcessMessage() const;
@@ -20,6 +22,10 @@ namespace CG {
         uint32_t GetClientHeight() const { return clientHeight_; }
 
     private:
+        Window() = default;
+        Window(const Window&) = delete;
+        const Window& operator=(const Window&) = delete;
+
         std::string name_;
         HWND hWnd_{ nullptr };
         uint32_t clientWidth_{ 0 };

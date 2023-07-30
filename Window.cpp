@@ -4,27 +4,28 @@
 
 #include "Utils.h"
 
-#ifdef _DEBUG
 #include "Externals/ImGui/imgui_impl_win32.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif // _DEBUG
 
 namespace CG {
 
     // ウィンドウプロシージャ
     LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
-#ifdef _DEBUG
         if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) { return true; }
-#endif // _DEBUG
 
-            // メッセージに対してゲーム固有の処理を行う
-            switch (msg) {
-            case WM_DESTROY:
-                PostQuitMessage(0);
-                return 0;
-            }
+        // メッセージに対してゲーム固有の処理を行う
+        switch (msg) {
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
+        }
         return DefWindowProc(hwnd, msg, wparam, lparam);
+    }
+
+    Window* Window::GetInstance() {
+        static Window instance;
+        return &instance;
     }
 
     void CG::Window::Initialize(const std::string& name, uint32_t clientWidth, uint32_t clientHeight) {

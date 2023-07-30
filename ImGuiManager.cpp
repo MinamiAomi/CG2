@@ -7,18 +7,21 @@
 #include "GraphicsEngine.h"
 
 namespace CG {
-
-    void CG::ImGuiManager::Initialize(const Window& window, GraphicsEngine& graphicsEngine) {
-        descriptor_ = graphicsEngine.GetSRVDescriptorHeap().Allocate();
+    ImGuiManager* ImGuiManager::GetInstance() {
+        static ImGuiManager instance;
+        return &instance;
+    }
+    void CG::ImGuiManager::Initialize(Window* window, GraphicsEngine* graphicsEngine) {
+        descriptor_ = graphicsEngine->GetSRVDescriptorHeap().Allocate();
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::StyleColorsDark();
-        ImGui_ImplWin32_Init(window.GetHWND());
+        ImGui_ImplWin32_Init(window->GetHWND());
         ImGui_ImplDX12_Init(
-            graphicsEngine.GetDevice().GetDevice().Get(),
+            graphicsEngine->GetDevice().GetDevice().Get(),
             DX12::SwapChain::kBackBufferCount,
-            graphicsEngine.GetSwapChain().GetRTVFormat(),
-            graphicsEngine.GetSRVDescriptorHeap().GetDescriptorHeap().Get(),
+            graphicsEngine->GetSwapChain().GetRTVFormat(),
+            graphicsEngine->GetSRVDescriptorHeap().GetDescriptorHeap().Get(),
             descriptor_.GetCPUHandle(),
             descriptor_.GetGPUHandle());
     }

@@ -3,16 +3,18 @@
 #include "Window.h"
 
 namespace CG {
-
+    GraphicsEngine* GraphicsEngine::GetInstance() {
+        static GraphicsEngine instance;
+        return &instance;
+    }
     void GraphicsEngine::Initialize(const Window* window) {
         window_ = window;
 
         device_.Initialize();
         commandQueue_.Initialize(device_, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        for (auto& commandList : commandLists_) {
-            commandList.Initialize(device_, commandQueue_);
-        }
+        commandList_.Initialize(device_, commandQueue_);
         fence_.Initialize(device_);
+        commandList_.Reset();
 
         rtvDescriptorHeap_.Initialize(device_, kRTVDescriptorHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
         dsvDescriptorHeap_.Initialize(device_, kDSVDescriptorHeapSize, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
@@ -24,10 +26,8 @@ namespace CG {
         scissorRect_ = DX12::ScissorRect(viewport_);
     }
 
-    DX12::CommandList& GraphicsEngine::PreDraw() {
-        auto& commandList = commandLists_[swapChain_.GetCurrentBackBufferIndex()];
-        commandList.Reset();
-        auto cmdList = commandList.GetCommandList();
+    void GraphicsEngine::PreDraw() {
+        auto cmdList = commandList_.GetCommandList();
 
         auto barrier = swapChain_.GetCurrentResource().TransitionBarrier(DX12::Resource::State::RenderTarget);
         cmdList->ResourceBarrier(1, &barrier);
@@ -44,19 +44,18 @@ namespace CG {
 
         ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap_.GetDescriptorHeap().Get() };
         cmdList->SetDescriptorHeaps(1, ppHeaps);
-
-        return commandList;
     }
 
-    void GraphicsEngine::PostDraw(DX12::CommandList& commandList) {
+    void GraphicsEngine::PostDraw() {
         auto barrier = swapChain_.GetCurrentResource().TransitionBarrier(DX12::Resource::State::Present);
-        commandList.GetCommandList()->ResourceBarrier(1, &barrier);
+        commandList_.GetCommandList()->ResourceBarrier(1, &barrier);
 
-        commandList.Close();
-        fence_.Wait();
-        commandQueue_.ExcuteCommandList(commandList);
+        commandList_.Close();
+        commandQueue_.ExcuteCommandList(commandList_);
         swapChain_.Present(1);
         fence_.Signal(commandQueue_);
+        fence_.Wait();
+        commandList_.Reset();
     }
 
 }

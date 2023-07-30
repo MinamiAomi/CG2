@@ -125,7 +125,7 @@ namespace CG::DX12 {
     }
 
     bool DescriptorHeap::UseTable::operator[](size_t index) {
-        return (table_[index >> kToBlockIndex] & (1ull << (index << kBlockMask))) != 0;
+        return (table_[index >> kToBlockIndex] & (1ull << (index & kBlockMask))) != 0;
     }
     bool DescriptorHeap::UseTable::All(bool value) {
         // 不必要なビットをそろえる

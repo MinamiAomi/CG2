@@ -1,47 +1,32 @@
 #include "Camera.h"
 
-#include "GameObject.h"
+#include "Input.hpp"
 
-namespace CG {
-
-    std::shared_ptr<Camera> Camera::mainCamera_;
-    size_t Camera::count_ = 0;
-
-    Camera::Camera(GameObject& gameObject) : Component(gameObject) {
-        ++count_;
+void Camera::Update() {
+    if (Input::IsMousePressed(MouseButton::Right)) {
+        constexpr float rotSpeed = 1.0f * Math::ToRadian;
+        rotate_.x += rotSpeed * Input::GetMouseMove().y * 0.1f;
+        rotate_.y += rotSpeed * Input::GetMouseMove().x * 0.1f;
+    }
+    else if (Input::IsMousePressed(MouseButton::Mid)) {
+        Matrix4x4 rotMat = Matrix4x4::MakeRotationXYZ(rotate_);
+        Vector3 cameraX = rotMat.GetXAxis() * Input::GetMouseMove().x * -0.01f;
+        Vector3 cameraY = rotMat.GetYAxis() * Input::GetMouseMove().y * 0.01f;
+        position_ += cameraX + cameraY;
+    }
+    else if (Input::GetWheel()) {
+        Matrix4x4 rotMat = Matrix4x4::MakeRotationXYZ(rotate_);
+        Vector3 cameraZ = rotMat.GetZAxis() * (Input::GetWheel() / 120 * 0.5f);
+        position_ += cameraZ;
     }
 
-    void Camera::OnInitialize() {
-        projection_ = Projection::Perspective;
-        perspective_.fovY = 45.0f * Math::ToRadian;
-        nearZ_ = 0.1f;
-        farZ_ = 1000.0f;
-    }
+    viewMatrix_ = Matrix4x4::MakeAffineInverse(Matrix4x4::MakeRotationXYZ(rotate_), position_);
+}
 
-    void Camera::OnUpdateWorldTransform() {
-        Matrix4x4 cameraMatrix = gameObject.GetWorldMatrix();
-        viewMatrix_ = gameObject.GetWorldMatrixInverse();
-        viewMatrixInverse_ = gameObject.GetWorldMatrix();
-
-        viewProjectionMatrix_ = viewMatrix_ * projectionMatrix_;
-        viewProjectionMatrixInverse_ = viewMatrixInverse_ * projectionMatrixInverse_;
-    }
-
-    void Camera::OnPreRender() {
-        if (needMatrixUpdating_) {
-            switch (projection_) {
-            case CG::Camera::Projection::Perspective:
-                projectionMatrix_ = Matrix4x4::MakePerspectiveProjection(perspective_.fovY, perspective_.aspectRaito, nearZ_, farZ_);
-                break;
-            case CG::Camera::Projection::Orthographic:
-                projectionMatrix_ = Matrix4x4::MakeOrthographicProjection(orthographic_.width, orthographic_.height, nearZ_, farZ_);
-                break;
-            }
-            projectionMatrixInverse_ = projectionMatrix_.Inverse();
-            viewProjectionMatrix_ = viewMatrix_ * projectionMatrix_;
-            viewProjectionMatrixInverse_ = viewMatrixInverse_ * projectionMatrixInverse_;
-            needMatrixUpdating_ = false;
-        }
-    }
-
+void Camera::SetProjectionMatrix(float fovY, float aspectRaito, float nearZ, float farZ) {
+    fovY_ = fovY;
+    aspectRaito_ = aspectRaito;
+    nearZ_ = nearZ;
+    farZ_ = farZ;
+    projectionMatrix_ = Matrix4x4::MakePerspectiveProjection(fovY_, aspectRaito_, nearZ_, farZ_);
 }
