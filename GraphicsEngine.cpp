@@ -4,8 +4,6 @@
 
 namespace CG {
 
-
-
     void GraphicsEngine::Initialize(const Window* window) {
         window_ = window;
 
@@ -43,6 +41,9 @@ namespace CG {
 
         cmdList->RSSetViewports(1, &viewport_);
         cmdList->RSSetScissorRects(1, &scissorRect_);
+
+        ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap_.GetDescriptorHeap().Get() };
+        cmdList->SetDescriptorHeaps(1, ppHeaps);
 
         return commandList;
     }

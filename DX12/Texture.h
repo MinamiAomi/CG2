@@ -19,7 +19,7 @@ namespace CG::DX12 {
 
     private:
         Resource resource_;
-        D3D12_RESOURCE_DESC desc_;
+        D3D12_RESOURCE_DESC desc_{};
     };
 
 }

@@ -25,6 +25,7 @@
 #include "Window.h"
 #include "GraphicsEngine.h"
 #include "ImGuiManager.h"
+#include "ResourceManager.h"
 #include "Model.h"
 
 
@@ -881,6 +882,13 @@ const uint32_t kClientHeight = 720;
 //    return view;
 //}
 
+#include "Scene.h"
+#include "GameObject.h"
+#include "Component.h"
+#include "ModelRenderer.h"
+#include "Camera.h"
+
+
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     CG::DX12::D3DResourceLeakChecker leakChecker;
     {
@@ -893,17 +901,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         CG::ImGuiManager imguiManager;
         imguiManager.Initialize(window, graphicsEngine);
 
-        CG::Model axis;
-        axis.LoadFromObj(graphicsEngine, "Resources", "axis.obj");
+        CG::ResourceManager resourceManager;
+        resourceManager.Initialize(&graphicsEngine);
+        auto model = resourceManager.LoadModelFromObj("Resources", "axis.obj");
+        auto multiMesh = resourceManager.LoadModelFromObj("Resources", "multiMesh.obj");
+        auto multiMaterial = resourceManager.LoadModelFromObj("Resources", "multiMaterial.obj");
 
-        CG::Model multiMesh;
-        multiMesh.LoadFromObj(graphicsEngine, "Resources", "multiMesh.obj");
+        CG::Scene scene;
+        {
+            auto mainCamera = scene.AddGameObject();
+            auto camera = mainCamera->AddComponent<CG::Camera>();
+            CG::Camera::SetMainCamera(camera);
+        }
 
-        CG::Model multiMaterial;
-        multiMaterial.LoadFromObj(graphicsEngine, "Resources", "multiMaterial.obj");
-
-        CG::Model mm;
-        mm.LoadFromObj(graphicsEngine, "Resources", "mm.obj");
+        {
+            auto object = scene.AddGameObject();
+            auto modelRenderer = object->AddComponent<CG::ModelRenderer>();
+            modelRenderer->SetModel();
+        }
 
         window.Show();
 
@@ -911,12 +926,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             imguiManager.NewFrame();
             auto& commandList = graphicsEngine.PreDraw();
 
-            
+            ImGui::Begin("Setting");
+            ImGui::End();
+
 
             imguiManager.Render(commandList);
             graphicsEngine.PostDraw(commandList);
         }
-        
+
         imguiManager.Finalize();
         window.Finalize();
     }

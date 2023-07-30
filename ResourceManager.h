@@ -2,32 +2,47 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "DX12/DX12.h"
 
 namespace CG {
 
-    class Mesh;
-    class Material;
-    class Texture;
+    class GraphicsEngine;
+    class Model;
+
+    class TextureSet {
+        friend class ResourceManager;
+    public:
+
+        const DX12::Texture& GetTexture() const { return texture_; }
+        const DX12::ShaderResourceView& GetView() const { return view_; }
+
+    private:
+        static std::shared_ptr<TextureSet> CreateTextureSet() { return std::shared_ptr<TextureSet>(new TextureSet); }
+
+        TextureSet() = default;
+        TextureSet(const TextureSet&) = delete;
+        const TextureSet& operator=(const TextureSet&) = delete;
+
+        DX12::Texture texture_;
+        DX12::ShaderResourceView view_;
+    };
 
     class ResourceManager {
     public:
-        void Initialize();
+        void Initialize(GraphicsEngine* graphicsEngine);
 
-        void AddMesh();
-        void AddMaterial();
-        void AddTexture();
+        std::shared_ptr<Model> LoadModelFromObj(const std::string& directory, const std::string& name);
+        std::shared_ptr<TextureSet> LoadTextureFromPNG(const std::string& path);
 
-        Mesh* FindMesh(const std::string& name);
-        Material* FindMaterial(const std::string& name);
-        Texture* FindTexture(const std::string& name);
+        const std::shared_ptr<Model>& FindModel(const std::string& name) { return modelMap_[name]; }
+        const std::shared_ptr<TextureSet>& FindTexture(const std::string& name) { return textureMap_[name]; }
 
     private:
-
-        std::vector<std::unique_ptr<Mesh>> meshes_;
-        std::vector<std::unique_ptr<Material>> materials_;
-        std::vector<std::unique_ptr<Texture>> textures_;
+        GraphicsEngine* graphicsEngine_{ nullptr };
+        std::unordered_map<std::string, std::shared_ptr<Model>> modelMap_;
+        std::unordered_map<std::string, std::shared_ptr<TextureSet>> textureMap_;
     };
 
 }

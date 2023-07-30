@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{6db9e17f-f197-4e42-b3f1-cb2ff6e91dbd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{54fff3a4-92f8-4cfb-bec5-7b915b47903c}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,15 @@
     </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{4ee58779-9466-42c9-83b9-92ea4f59ecea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{07031cd7-2aaf-40af-9d06-141df56a08fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editer">
+      <UniqueIdentifier>{caec3bb5-e3ff-4101-9080-7a92b696f8fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{6db9e17f-f197-4e42-b3f1-cb2ff6e91dbd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,9 +64,6 @@
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="DirectXUtils.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="DX12\CommandList.cpp">
@@ -126,6 +129,21 @@
     <ClCompile Include="ImGuiManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Editer\EditerManager.cpp">
+      <Filter>Editer</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -153,9 +171,6 @@
       <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="DirectXUtils.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Math\MathUtils.h">
@@ -212,9 +227,6 @@
     <ClInclude Include="Utils.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\Texture.h">
       <Filter>DirectX</Filter>
     </ClInclude>
@@ -226,6 +238,48 @@
     </ClInclude>
     <ClInclude Include="ImGuiManager.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelRenderer.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\Editer.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\EditerManager.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\HierarchyView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\InspectorView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\SceneView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\ResourceView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\GameView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Editer\ConsoleView.h">
+      <Filter>Editer</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
