@@ -122,6 +122,7 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PostEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -229,6 +230,7 @@
     <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="PostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NoneLighting.PS.hlsl">
@@ -244,6 +246,12 @@
       <Filter>Resource\Shader</Filter>
     </None>
     <None Include="HalfLambertLighting.PS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="PostEffect.VS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="Test.PS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
   </ItemGroup>

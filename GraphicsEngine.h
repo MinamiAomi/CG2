@@ -24,6 +24,8 @@ namespace CG {
         DX12::DescriptorHeap& GetDSVDescriptorHeap() { return dsvDescriptorHeap_; }
         DX12::DescriptorHeap& GetSRVDescriptorHeap() { return srvDescriptorHeap_; }
         DX12::SwapChain& GetSwapChain() { return swapChain_; }
+        DX12::ShaderCompiler& GetShaderCompiler() { return shaderCompiler_; }
+        DX12::DepthStencilResource& GetDepthStencilResource() { return depthStencilResource; }
 
     private:
         GraphicsEngine() = default;
@@ -50,6 +52,8 @@ namespace CG {
         DX12::DepthStencilResource depthStencilResource;
         DX12::Viewport viewport_;
         DX12::ScissorRect scissorRect_;
+
+        DX12::ShaderCompiler shaderCompiler_;
     };
 
 }

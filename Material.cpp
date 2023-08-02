@@ -22,8 +22,6 @@ namespace CG {
     void Material::StaticInitialize(GraphicsEngine* graphicsEngine, TextureManager* textureManager) {
         graphicsEngine_ = graphicsEngine;
         textureManager_ = textureManager;
-        DX12::ShaderCompiler shaderCompiler;
-        shaderCompiler.Initialize();
 
         DX12::RootSignatureDesc rsDesc;
         rsDesc.AddDescriptor(DX12::DescriptorType::CBV, 0, DX12::ShaderVisibility::Vertex);
@@ -36,11 +34,11 @@ namespace CG {
         rootSignature_.Initialize(graphicsEngine_->GetDevice(), rsDesc);
 
 
-        DX12::Shader vs = shaderCompiler.Compile("Object3d.VS.hlsl", L"vs_6_0");
+        DX12::Shader vs = graphicsEngine->GetShaderCompiler().Compile("Object3d.VS.hlsl", L"vs_6_0");
         DX12::Shader ps[kLightingCount]{
-            shaderCompiler.Compile("NoneLighting.PS.hlsl", L"ps_6_0"),
-            shaderCompiler.Compile("LambertLighting.PS.hlsl", L"ps_6_0"),
-            shaderCompiler.Compile("HalfLambertLighting.PS.hlsl", L"ps_6_0"),
+            graphicsEngine->GetShaderCompiler().Compile("NoneLighting.PS.hlsl", L"ps_6_0"),
+            graphicsEngine->GetShaderCompiler().Compile("LambertLighting.PS.hlsl", L"ps_6_0"),
+            graphicsEngine->GetShaderCompiler().Compile("HalfLambertLighting.PS.hlsl", L"ps_6_0"),
         };
 
         DX12::GraphicsPipelineStateDesc psDesc;

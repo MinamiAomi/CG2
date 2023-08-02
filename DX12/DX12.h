@@ -117,6 +117,7 @@ namespace CG::DX12 {
         Resource& GetResource() { return resource_; }
         const Resource& GetResource() const { return resource_; }
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle() const { return view_.GetDescriptor().GetCPUHandle(); }
+        const DepthStencilView& GetView() const { return view_; }
 
     private:
         Resource resource_;

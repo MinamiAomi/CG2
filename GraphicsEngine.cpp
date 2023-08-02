@@ -24,6 +24,8 @@ namespace CG {
         depthStencilResource.Initialize(device_, dsvDescriptorHeap_, window->GetClientWidth(), window->GetClientHeight());
         viewport_ = DX12::Viewport(static_cast<float>(window->GetClientWidth()), static_cast<float>(window->GetClientHeight()));
         scissorRect_ = DX12::ScissorRect(viewport_);
+
+        shaderCompiler_.Initialize();
     }
 
     void GraphicsEngine::PreDraw() {

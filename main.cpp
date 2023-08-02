@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "Object.h"
 
+#include "PostEffect.h"
+
 struct DirectionalLightConstantData {
     Vector4 color;
     Vector3 direction;
@@ -64,7 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             objMap["sphere"]->CreateSphere(1.0f, 16);
         }
         LoadObj("axis.obj");
-        LoadObj("bunny.obj");
+        //LoadObj("bunny.obj");
         LoadObj("teapot.obj");
         LoadObj("suzanne.obj");
         LoadObj("multiMesh.obj");
@@ -92,6 +94,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
         CG::Camera camera;
         camera.SetProjectionMatrix(45.0f * Math::ToRadian, float(window->GetClientWidth()) / window->GetClientHeight(), 0.1f, 1000.0f);
+
+        CG::PostEffect::Desc postEffectDesc;
+        
+        postEffectDesc.clearColor[0] = 0.2f;
+        postEffectDesc.clearColor[1] = 0.3f;
+        postEffectDesc.clearColor[2] = 0.6f;
+        postEffectDesc.clearColor[3] = 1.0f;
+        postEffectDesc.width = 1280;
+        postEffectDesc.height = 720;
+        postEffectDesc.resourceFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        postEffectDesc.targetFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        postEffectDesc.pixelShaderName = "Test.PS.hlsl";
+        
+        CG::PostEffect testPostEffect;
+        testPostEffect.Initialize(*graphicsEngine, postEffectDesc);
+
+
 
         window->Show();
 
@@ -162,15 +181,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 object->UpdateTransform(viewProjection);
             }
 
-            graphicsEngine->PreDraw();
+
             auto& commandList = graphicsEngine->GetCommandList();
+            testPostEffect.SetRenderTarget(commandList, graphicsEngine->GetDepthStencilResource().GetView());
+
             memcpy(lightBuffer.GetDataBegin(), &light, sizeof(light));
             CG::Material::DrawSetting(commandList, lightBuffer.GetResource().GetGPUVirtualAddress());
 
             for (auto& object : objects) {
                 object->Draw(commandList);
             }
-
+            graphicsEngine->PreDraw();
+            testPostEffect.Draw(commandList);
             imguiManager->Render(commandList);
             graphicsEngine->PostDraw();
         }
