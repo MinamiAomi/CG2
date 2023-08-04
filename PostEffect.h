@@ -36,6 +36,9 @@ namespace CG {
 
         DX12::DynamicBuffer extendedData_;
 
+        DX12::Viewport viewport_;
+        DX12::ScissorRect scissorRect_;
+
         float clearColor_[4];
         bool isRendering;
     };

@@ -16,7 +16,7 @@ namespace CG {
             rootSignatureDesc.AddDescriptorTable(DX12::ShaderVisibility::Pixel);
             rootSignatureDesc.AddDescriptorRange(DX12::RangeType::SRV, 0, 1);
             rootSignatureDesc.AddDescriptor(DX12::DescriptorType::CBV, 0, DX12::ShaderVisibility::Pixel);
-            rootSignatureDesc.AddStaticSampler(0, DX12::ShaderVisibility::Pixel);
+            rootSignatureDesc.AddStaticSampler(0, DX12::ShaderVisibility::Pixel, 0, DX12::AddressMode::Clamp, DX12::AddressMode::Clamp, DX12::AddressMode::Clamp);
             rootSignatureDesc.AddFlag(D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
             rootSignature_.Initialize(graphicsEngine.GetDevice(), rootSignatureDesc);
         }
@@ -72,6 +72,9 @@ namespace CG {
         memcpy(clearColor_, desc.clearColor, sizeof(clearColor_));
 
         isRendering = false;
+
+        viewport_ = DX12::Viewport(float(desc.width), float(desc.height));
+        scissorRect_ = DX12::ScissorRect(viewport_);
     }
 
     void PostEffect::SetRenderTarget(DX12::CommandList& commandList, const DX12::DepthStencilView& dsv) {
@@ -85,6 +88,9 @@ namespace CG {
         cmdList->OMSetRenderTargets(1, &rtv, false, &dsvHandle);
         cmdList->ClearRenderTargetView(rtv, clearColor_, 0, nullptr);
         cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+        cmdList->RSSetViewports(1, &viewport_);
+        cmdList->RSSetScissorRects(1, &scissorRect_);
 
         isRendering = true;
     }

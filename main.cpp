@@ -95,6 +95,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         CG::Camera camera;
         camera.SetProjectionMatrix(45.0f * Math::ToRadian, float(window->GetClientWidth()) / window->GetClientHeight(), 0.1f, 1000.0f);
 
+        struct PostEffectConstant {
+            uint32_t width;
+            uint32_t height;
+            uint32_t cycle;
+            float time;
+        };
+
         CG::PostEffect::Desc postEffectDesc;
         
         postEffectDesc.clearColor[0] = 0.2f;
@@ -106,9 +113,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         postEffectDesc.resourceFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         postEffectDesc.targetFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         postEffectDesc.pixelShaderName = "Test.PS.hlsl";
+        postEffectDesc.extendedDataSize = sizeof(PostEffectConstant);
         
         CG::PostEffect testPostEffect;
         testPostEffect.Initialize(*graphicsEngine, postEffectDesc);
+
+        PostEffectConstant postEffectConstant{};
+        postEffectConstant.width = 1280;
+        postEffectConstant.height = 720;
+        postEffectConstant.cycle = 60;
+        postEffectConstant.time = 0.0f;
 
 
 
@@ -181,8 +195,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
                 object->UpdateTransform(viewProjection);
             }
 
+            postEffectConstant.time += 1.0f / 60.0f;
+            testPostEffect.TransferExtendedData(&postEffectConstant, sizeof(postEffectConstant));
 
             auto& commandList = graphicsEngine->GetCommandList();
+            graphicsEngine->SetDescriptorHeap();
             testPostEffect.SetRenderTarget(commandList, graphicsEngine->GetDepthStencilResource().GetView());
 
             memcpy(lightBuffer.GetDataBegin(), &light, sizeof(light));
