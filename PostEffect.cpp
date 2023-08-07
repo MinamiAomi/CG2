@@ -71,6 +71,8 @@ namespace CG {
 
         memcpy(clearColor_, desc.clearColor, sizeof(clearColor_));
 
+        viewport_ = DX12::Viewport(float(desc.width), float(desc.height));
+        scissorRect_ = DX12::ScissorRect(viewport_);
         isRendering = false;
     }
 
@@ -85,6 +87,9 @@ namespace CG {
         cmdList->OMSetRenderTargets(1, &rtv, false, &dsvHandle);
         cmdList->ClearRenderTargetView(rtv, clearColor_, 0, nullptr);
         cmdList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+        cmdList->RSSetViewports(1, &viewport_);
+        cmdList->RSSetScissorRects(1, &scissorRect_);
 
         isRendering = true;
     }

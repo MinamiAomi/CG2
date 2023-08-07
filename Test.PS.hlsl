@@ -10,8 +10,7 @@ struct PixelShaderOutput {
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 
-PixelShaderOutput main(PixelShaderInput input)
-{
+PixelShaderOutput main(PixelShaderInput input) {
     PixelShaderOutput output;
     float32_t4 texColor = gTexture.Sample(gSampler, input.texcoord);
     output.color = texColor;

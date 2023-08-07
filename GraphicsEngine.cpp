@@ -43,9 +43,6 @@ namespace CG {
 
         cmdList->RSSetViewports(1, &viewport_);
         cmdList->RSSetScissorRects(1, &scissorRect_);
-
-        ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap_.GetDescriptorHeap().Get() };
-        cmdList->SetDescriptorHeaps(1, ppHeaps);
     }
 
     void GraphicsEngine::PostDraw() {
@@ -58,6 +55,11 @@ namespace CG {
         fence_.Signal(commandQueue_);
         fence_.Wait();
         commandList_.Reset();
+    }
+
+    void GraphicsEngine::SetDescriptorHeap() {
+        ID3D12DescriptorHeap* ppHeaps[] = { srvDescriptorHeap_.GetDescriptorHeap().Get() };
+        commandList_.GetCommandList()->SetDescriptorHeaps(1, ppHeaps);
     }
 
 }

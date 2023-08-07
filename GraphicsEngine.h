@@ -14,6 +14,8 @@ namespace CG {
         void Initialize(const Window* targetWindow);
         void PreDraw();
         void PostDraw();
+
+        void SetDescriptorHeap();
         
         const Window* GetWindow() const { return window_; }
         DX12::Device& GetDevice() { return device_; }

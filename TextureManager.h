@@ -16,7 +16,6 @@ namespace CG {
         void Initialize(GraphicsEngine* graphicsEngine);
 
         uint32_t LoadTexture(const std::string& name);
-
         void SetRootDescriptorTable(DX12::CommandList& commandList, uint32_t rootParameterIndex, uint32_t textureHandle);
 
         uint32_t Edit(const std::string& label, uint32_t currentTextureHandle);
