@@ -20,6 +20,8 @@
 
 #include "PostEffect.h"
 
+
+
 struct DirectionalLightConstantData {
     Vector4 color;
     Vector3 direction;
@@ -66,7 +68,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             objMap["sphere"]->CreateSphere(1.0f, 16);
         }
         LoadObj("axis.obj");
-        LoadObj("bunny.obj");
+        //LoadObj("bunny.obj");
         LoadObj("teapot.obj");
         LoadObj("suzanne.obj");
         LoadObj("multiMesh.obj");

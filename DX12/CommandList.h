@@ -20,10 +20,6 @@ namespace CG::DX12 {
         void Close();
         void Reset();
 
-        void SetVertexBuffer(uint32_t startSlot, const VertexBufferView& view);
-        void SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBufferView*> views);
-        void SetIndexBuffer(const IndexBufferView& view);
-
         bool IsEnabled() const { return commandList_; }
         bool IsRecording() const { return isRecording_; }
         ComPtr<ID3D12GraphicsCommandList> GetCommandList() const { return commandList_; }

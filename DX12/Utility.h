@@ -1,6 +1,16 @@
 #pragma once
 
+#include <winerror.h>
+
+#include <cassert>
 #include <string>
+
+#ifdef ASSERT
+#undef ASSERT
+#endif 
+
+#define ASSERT(x) assert(x)
+#define ASSERT_SUCCEEDED(hr) ASSERT(SUCCEEDED(hr))
 
 namespace CG {
 

@@ -53,20 +53,4 @@ namespace CG::DX12 {
         isRecording_ = true;
     }
 
-    void CommandList::SetVertexBuffer(uint32_t startSlot, const VertexBufferView& view) {
-        commandList_->IASetVertexBuffers(startSlot, 1, &view.GetView());
-    }
-
-    void CommandList::SetVertexBuffers(uint32_t startSlot, std::initializer_list<const VertexBufferView*> views) {
-        std::vector<D3D12_VERTEX_BUFFER_VIEW> pViews(views.size());
-        for (auto dest = pViews.begin(); auto src : views) {
-            *dest = src->GetView();
-        }
-        commandList_->IASetVertexBuffers(startSlot, static_cast<uint32_t>(pViews.size()), pViews.data());
-    }
-
-    void CommandList::SetIndexBuffer(const IndexBufferView& view) {
-        commandList_->IASetIndexBuffer(&view.GetView());
-    }
-
 }

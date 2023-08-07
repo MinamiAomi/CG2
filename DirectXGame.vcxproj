@@ -100,6 +100,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\Device.cpp" />
     <ClCompile Include="DX12\DX12.cpp" />
     <ClCompile Include="DX12\Fence.cpp" />
+    <ClCompile Include="DX12\Graphics.cpp" />
     <ClCompile Include="DX12\PipelineState.cpp" />
     <ClCompile Include="DX12\Resource.cpp" />
     <ClCompile Include="DX12\RootSignature.cpp" />
@@ -107,6 +108,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\ShaderCompiler.cpp" />
     <ClCompile Include="DX12\SwapChain.cpp" />
     <ClCompile Include="DX12\Texture.cpp" />
+    <ClCompile Include="DX12\UploadBuffer.cpp" />
     <ClCompile Include="DX12\Views.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
@@ -125,7 +127,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PostEffect.cpp" />
     <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +138,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\Device.h" />
     <ClInclude Include="DX12\DX12.h" />
     <ClInclude Include="DX12\Fence.h" />
+    <ClInclude Include="DX12\GPUResource.h" />
+    <ClInclude Include="DX12\Graphics.h" />
     <ClInclude Include="DX12\PipelineState.h" />
     <ClInclude Include="DX12\Resource.h" />
     <ClInclude Include="DX12\RootSignature.h" />
@@ -144,6 +147,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\ShaderCompiler.h" />
     <ClInclude Include="DX12\SwapChain.h" />
     <ClInclude Include="DX12\Texture.h" />
+    <ClInclude Include="DX12\TextureResource.h" />
+    <ClInclude Include="DX12\UploadBuffer.h" />
+    <ClInclude Include="DX12\Utility.h" />
     <ClInclude Include="DX12\Views.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
@@ -163,10 +169,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Object.h" />
     <ClInclude Include="PostEffect.h" />
     <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="Utils.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="DX12\Utilitycpp" />
     <None Include="Object3D.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

@@ -20,6 +20,9 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{6db9e17f-f197-4e42-b3f1-cb2ff6e91dbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{037960d9-387a-4f3b-b817-dc45accd18a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\MathUtils.cpp">
@@ -70,9 +73,6 @@
     <ClCompile Include="DX12\PipelineState.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="DX12\Resource.cpp">
-      <Filter>DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\RootSignature.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
@@ -87,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="DX12\Views.cpp">
       <Filter>DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsEngine.cpp">
       <Filter>Engine</Filter>
@@ -123,6 +120,15 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="DX12\Graphics.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\UploadBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\Resource.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -176,9 +182,6 @@
     <ClInclude Include="DX12\PipelineState.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\Resource.h">
-      <Filter>DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\RootSignature.h">
       <Filter>DirectX</Filter>
     </ClInclude>
@@ -195,9 +198,6 @@
       <Filter>DirectX</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsEngine.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="DX12\Texture.h">
@@ -231,6 +231,24 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="DX12\Graphics.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Utility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\UploadBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\GPUResource.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\Resource.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\TextureResource.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="NoneLighting.PS.hlsl">
@@ -253,6 +271,9 @@
     </None>
     <None Include="Test.PS.hlsl">
       <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="DX12\Utilitycpp">
+      <Filter>Core</Filter>
     </None>
   </ItemGroup>
 </Project>
