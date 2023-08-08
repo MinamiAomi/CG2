@@ -129,6 +129,15 @@
     <ClCompile Include="DX12\Resource.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="DX12\PixelBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\DepthBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12\ColorBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -240,14 +249,23 @@
     <ClInclude Include="DX12\UploadBuffer.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\GPUResource.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\Resource.h">
       <Filter>DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="DX12\TextureResource.h">
+    <ClInclude Include="DX12\Defines.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\PixelBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\GPUResource.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\DepthBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12\ColorBuffer.h">
+      <Filter>DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

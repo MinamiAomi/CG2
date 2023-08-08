@@ -12,8 +12,8 @@
 class UploadBuffer {
 public:
     struct Allocation {
-        const void* cpu;
-        const D3D12_GPU_VIRTUAL_ADDRESS gpu;
+        void* cpu;
+        D3D12_GPU_VIRTUAL_ADDRESS gpu;
     };
 
     explicit UploadBuffer(size_t pageSize = UNIT_MB(2));
@@ -41,7 +41,7 @@ private:
         Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
         void* cpuPtr_;
         D3D12_GPU_VIRTUAL_ADDRESS gpuPtr_;
-        const size_t pageSize_;
+        size_t pageSize_;
         size_t offset_;
     };
 

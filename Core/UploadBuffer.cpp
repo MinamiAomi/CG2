@@ -3,7 +3,39 @@
 #include "../Externals/DirectXTex/d3dx12.h"
 
 #include "Graphics.h"
-#include "Utility.h"
+
+void UploadBuffer::Create(const std::wstring& name, size_t bufferSize) {
+
+    Destory();
+
+    bufferSize_ = bufferSize;
+
+    D3D12_HEAP_PROPERTIES heapProperties{};
+    heapProperties.Type = D3D12_HEAP_TYPE_UPLOAD;
+    heapProperties.CreationNodeMask = 1;
+    heapProperties.VisibleNodeMask = 1;
+
+    D3D12_RESOURCE_DESC resourceDesc = GetBufferDesc(bufferSize_);
+
+    ASSERT_SUCCEEDED(Graphics::GetInstance()->GetDevice()->CreateCommittedResource(
+        &heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(resource_.GetAddressOf())));
+
+    currentState_ = D3D12_RESOURCE_STATE_GENERIC_READ;
+    gpuVirtualAddress_ = resource_->GetGPUVirtualAddress();
+
+    ID3D12OBJECT_SET_NAME(resource_, name.c_str());
+}
+
+void* UploadBuffer::Map() {
+    void* dataBegin = nullptr;
+    resource_->Map(0, nullptr, &dataBegin);
+    return dataBegin;
+}
+
+void UploadBuffer::Unmap() {
+    resource_->Unmap(0, nullptr);
+}
 
 UploadBuffer::UploadBuffer(size_t pageSize) :
     pageSize_(pageSize) {
@@ -13,10 +45,8 @@ UploadBuffer::~UploadBuffer() {
 }
 
 UploadBuffer::Allocation UploadBuffer::Allocate(size_t sizeInByte, size_t alignment) {
-    // ページサイズが足りない。
     ASSERT(sizeInByte <= pageSize_);
 
-    // 新しいページを要求
     if (!currentPage_ || !currentPage_->HasSpace(sizeInByte, alignment)) {
         currentPage_ = RequestPage();
     }
@@ -74,26 +104,12 @@ UploadBuffer::Page::~Page() {
 }
 
 bool UploadBuffer::Page::HasSpace(size_t sizeInByte, size_t alignment) const {
-    size_t alignedSize = Utility::AlignUp(sizeInByte, alignment);
-    size_t alignedOffset = Utility::AlignUp(offset_, alignment);
-
-    return alignedOffset + alignedSize <= pageSize_;
+    return false;
 }
 
 UploadBuffer::Allocation UploadBuffer::Page::Allocate(size_t sizeInByte, size_t alignment) {
-    size_t alignedSize = Utility::AlignUp(sizeInByte, alignment);
-    offset_ = Utility::AlignUp(offset_, alignment);
-
-    Allocation allocation{
-        .cpu = static_cast<uint8_t*>(cpuPtr_) + offset_,
-        .gpu = gpuPtr_ + offset_,
-    };
-
-    offset_ += alignedSize;
-
-    return allocation;
+    return Allocation();
 }
 
 void UploadBuffer::Page::Reset() {
-    offset_ = 0;
 }

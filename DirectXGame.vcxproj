@@ -93,8 +93,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DX12\ColorBuffer.cpp" />
     <ClCompile Include="DX12\CommandList.cpp" />
     <ClCompile Include="DX12\CommandQueue.cpp" />
+    <ClCompile Include="DX12\DepthBuffer.cpp" />
     <ClCompile Include="DX12\Descriptor.cpp" />
     <ClCompile Include="DX12\DescriptorHeap.cpp" />
     <ClCompile Include="DX12\Device.cpp" />
@@ -102,6 +104,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\Fence.cpp" />
     <ClCompile Include="DX12\Graphics.cpp" />
     <ClCompile Include="DX12\PipelineState.cpp" />
+    <ClCompile Include="DX12\PixelBuffer.cpp" />
     <ClCompile Include="DX12\Resource.cpp" />
     <ClCompile Include="DX12\RootSignature.cpp" />
     <ClCompile Include="DX12\Shader.cpp" />
@@ -131,8 +134,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DX12\ColorBuffer.h" />
     <ClInclude Include="DX12\CommandList.h" />
     <ClInclude Include="DX12\CommandQueue.h" />
+    <ClInclude Include="DX12\Defines.h" />
+    <ClInclude Include="DX12\DepthBuffer.h" />
     <ClInclude Include="DX12\Descriptor.h" />
     <ClInclude Include="DX12\DescriptorHeap.h" />
     <ClInclude Include="DX12\Device.h" />
@@ -147,7 +153,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\ShaderCompiler.h" />
     <ClInclude Include="DX12\SwapChain.h" />
     <ClInclude Include="DX12\Texture.h" />
-    <ClInclude Include="DX12\TextureResource.h" />
+    <ClInclude Include="DX12\PixelBuffer.h" />
     <ClInclude Include="DX12\UploadBuffer.h" />
     <ClInclude Include="DX12\Utility.h" />
     <ClInclude Include="DX12\Views.h" />
