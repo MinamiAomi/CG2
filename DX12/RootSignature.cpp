@@ -3,6 +3,9 @@
 #include <cassert>
 
 #include "Device.h"
+#include "RootSignature.h"
+#include "RootSignature.h"
+#include "RootSignature.h"
 
 namespace CG::DX12 {
 
@@ -118,3 +121,5 @@ namespace CG::DX12 {
     }
 
 }
+
+

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -93,6 +93,25 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Core\ByteAddressBuffer.cpp" />
+    <ClCompile Include="Core\CommandAllocatorPool.cpp" />
+    <ClCompile Include="Core\ConstantBuffer.cpp" />
+    <ClCompile Include="Core\Defines.cpp" />
+    <ClCompile Include="Core\DescriptorAllocation.cpp" />
+    <ClCompile Include="Core\DescriptorAllocator.cpp" />
+    <ClCompile Include="Core\DescriptorAllocatorPage.cpp" />
+    <ClCompile Include="Core\DynamicDescriptorHeap.cpp" />
+    <ClCompile Include="Core\GPUBuffer.cpp" />
+    <ClCompile Include="Core\Graphics.cpp" />
+    <ClCompile Include="Core\GPUResource.cpp" />
+    <ClCompile Include="Core\IndexBuffer.cpp" />
+    <ClCompile Include="Core\RenderTarget.cpp" />
+    <ClCompile Include="Core\ResourceStateTracker.cpp" />
+    <ClCompile Include="Core\RootSignature.cpp" />
+    <ClCompile Include="Core\StructuredBuffer.cpp" />
+    <ClCompile Include="Core\Texture.cpp" />
+    <ClCompile Include="Core\UploadBuffer.cpp" />
+    <ClCompile Include="Core\VertexBuffer.cpp" />
     <ClCompile Include="DX12\ColorBuffer.cpp" />
     <ClCompile Include="DX12\CommandList.cpp" />
     <ClCompile Include="DX12\CommandQueue.cpp" />
@@ -102,7 +121,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\Device.cpp" />
     <ClCompile Include="DX12\DX12.cpp" />
     <ClCompile Include="DX12\Fence.cpp" />
-    <ClCompile Include="DX12\Graphics.cpp" />
     <ClCompile Include="DX12\PipelineState.cpp" />
     <ClCompile Include="DX12\PixelBuffer.cpp" />
     <ClCompile Include="DX12\Resource.cpp" />
@@ -111,7 +129,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="DX12\ShaderCompiler.cpp" />
     <ClCompile Include="DX12\SwapChain.cpp" />
     <ClCompile Include="DX12\Texture.cpp" />
-    <ClCompile Include="DX12\UploadBuffer.cpp" />
     <ClCompile Include="DX12\Views.cpp" />
     <ClCompile Include="Externals\ImGui\imgui.cpp" />
     <ClCompile Include="Externals\ImGui\imgui_demo.cpp" />
@@ -134,10 +151,33 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Core\ByteAddressBuffer.h" />
+    <ClInclude Include="Core\CommandAllocatorPool.h" />
+    <ClInclude Include="Core\CommandList.h" />
+    <ClInclude Include="Core\CommandListManager.h" />
+    <ClInclude Include="Core\ConstantBuffer.h" />
+    <ClInclude Include="Core\Defines.h" />
+    <ClInclude Include="Core\DescriptorAllocation.h" />
+    <ClInclude Include="Core\DescriptorAllocator.h" />
+    <ClInclude Include="Core\DescriptorAllocatorPage.h" />
+    <ClInclude Include="Core\DynamicDescriptorHeap.h" />
+    <ClInclude Include="Core\GPUBuffer.h" />
+    <ClInclude Include="Core\Graphics.h" />
+    <ClInclude Include="Core\GPUResource.h" />
+    <ClInclude Include="Core\IndexBuffer.h" />
+    <ClInclude Include="Core\RenderTarget.h" />
+    <ClInclude Include="Core\ResourceStateTracker.h" />
+    <ClInclude Include="Core\RootSignature.h" />
+    <ClInclude Include="Core\StructuredBuffer.h" />
+    <ClInclude Include="Core\Texture.h" />
+    <ClInclude Include="Core\TextureUsage.h" />
+    <ClInclude Include="Core\ThreadSafeQueue.h" />
+    <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Core\Utility.h" />
+    <ClInclude Include="Core\VertexBuffer.h" />
     <ClInclude Include="DX12\ColorBuffer.h" />
     <ClInclude Include="DX12\CommandList.h" />
     <ClInclude Include="DX12\CommandQueue.h" />
-    <ClInclude Include="DX12\Defines.h" />
     <ClInclude Include="DX12\DepthBuffer.h" />
     <ClInclude Include="DX12\Descriptor.h" />
     <ClInclude Include="DX12\DescriptorHeap.h" />
@@ -145,7 +185,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\DX12.h" />
     <ClInclude Include="DX12\Fence.h" />
     <ClInclude Include="DX12\GPUResource.h" />
-    <ClInclude Include="DX12\Graphics.h" />
     <ClInclude Include="DX12\PipelineState.h" />
     <ClInclude Include="DX12\Resource.h" />
     <ClInclude Include="DX12\RootSignature.h" />
@@ -154,8 +193,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="DX12\SwapChain.h" />
     <ClInclude Include="DX12\Texture.h" />
     <ClInclude Include="DX12\PixelBuffer.h" />
-    <ClInclude Include="DX12\UploadBuffer.h" />
-    <ClInclude Include="DX12\Utility.h" />
     <ClInclude Include="DX12\Views.h" />
     <ClInclude Include="Externals\ImGui\imconfig.h" />
     <ClInclude Include="Externals\ImGui\imgui.h" />
@@ -178,7 +215,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DX12\Utilitycpp" />
+    <None Include="Core\Utilitycpp" />
     <None Include="Object3D.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>

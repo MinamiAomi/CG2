@@ -9,6 +9,18 @@
 #include "CommandQueue.h"
 #include "CommandList.h"
 #include "Fence.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
+#include "Texture.h"
 
 namespace CG::DX12 {
 

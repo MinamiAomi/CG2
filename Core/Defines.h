@@ -19,23 +19,34 @@
 #undef ASSERT
 #endif 
 
-
 #define ASSERT(x) assert(x)
-#define ASSERT_SUCCEEDED(hr) ASSERT(SUCCEEDED(hr))
+
 
 #define STRINGIFY_(x) #x
 #define STRINGIFY(x) STRINGIFY_(x)
-#define WSTRINGIFY_(x) L##x
+#define WSTRINGIFY_(x) L#x
 #define WSTRINGIFY(x) WSTRINGIFY_(x)
 
+void AssertIfFailed(HRESULT hr, const char* str, const char* file, const char* line);
+
+#define ASSERT_IF_FAILED(hr) AssertIfFailed(hr, STRINGIFY(hr), __FILE__, STRINGIFY(__LINE__))
+
 #ifdef _DEBUG
-#define NAME_D3D12_OBJECT(x) x->SetName(WSTRINGIFY(__FILE__ "(" STRINGIFY(__LINE__) "): " Lx) )
+#define NAME_D3D12_OBJECT(x) x->SetName(WSTRINGIFY(__FILE__ "(" STRINGIFY(__LINE__) "): " WSTRINGIFY(x)))
 #else
-#define NAME_D3D12_OBJECT(x) (void)(x)
+#define NAME_D3D12_OBJECT(x) ((void)0)
 #endif // _DEBUG
 
 #ifndef D3D12_GPU_VIRTUAL_ADDRESS_NULL
 #define D3D12_GPU_VIRTUAL_ADDRESS_NULL ((D3D12_GPU_VIRTUAL_ADDRESS)0)
+#endif
+
+#ifndef D3D12_CPU_DESCRIPTOR_HANDLE_NULL
+#define D3D12_CPU_DESCRIPTOR_HANDLE_NULL (D3D12_CPU_DESCRIPTOR_HANDLE{0})
+#endif
+
+#ifndef D3D12_GPU_DESCRIPTOR_HANDLE_NULL
+#define D3D12_GPU_DESCRIPTOR_HANDLE_NULL (D3D12_GPU_DESCRIPTOR_HANDLE{0})
 #endif
 
 #define UNIT_KB(x) (x * 1024)

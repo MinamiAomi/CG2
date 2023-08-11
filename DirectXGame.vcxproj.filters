@@ -120,12 +120,6 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="DX12\Graphics.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12\UploadBuffer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="DX12\Resource.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
@@ -138,6 +132,61 @@
     <ClCompile Include="DX12\ColorBuffer.cpp">
       <Filter>DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Graphics.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\UploadBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DescriptorAllocator.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DescriptorAllocatorPage.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DescriptorAllocation.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DynamicDescriptorHeap.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RootSignature.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Defines.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GPUResource.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ResourceStateTracker.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GPUBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\VertexBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IndexBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\StructuredBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Texture.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ByteAddressBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ConstantBuffer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\RenderTarget.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CommandAllocatorPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\ImGui\imconfig.h">
@@ -240,20 +289,8 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="DX12\Graphics.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\Utility.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\UploadBuffer.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DX12\Resource.h">
       <Filter>DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12\Defines.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="DX12\PixelBuffer.h">
       <Filter>DirectX</Filter>
@@ -266,6 +303,78 @@
     </ClInclude>
     <ClInclude Include="DX12\ColorBuffer.h">
       <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Defines.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Graphics.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UploadBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DescriptorAllocator.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DescriptorAllocatorPage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DescriptorAllocation.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandList.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DynamicDescriptorHeap.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RootSignature.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GPUResource.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ResourceStateTracker.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GPUBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\VertexBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IndexBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\StructuredBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\TextureUsage.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Texture.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ByteAddressBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ConstantBuffer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\RenderTarget.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ThreadSafeQueue.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandListManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\CommandAllocatorPool.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -290,7 +399,7 @@
     <None Include="Test.PS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
-    <None Include="DX12\Utilitycpp">
+    <None Include="Core\Utilitycpp">
       <Filter>Core</Filter>
     </None>
   </ItemGroup>
