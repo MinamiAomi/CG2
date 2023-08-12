@@ -93,25 +93,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Core\ByteAddressBuffer.cpp" />
-    <ClCompile Include="Core\CommandAllocatorPool.cpp" />
-    <ClCompile Include="Core\ConstantBuffer.cpp" />
-    <ClCompile Include="Core\Defines.cpp" />
-    <ClCompile Include="Core\DescriptorAllocation.cpp" />
-    <ClCompile Include="Core\DescriptorAllocator.cpp" />
-    <ClCompile Include="Core\DescriptorAllocatorPage.cpp" />
-    <ClCompile Include="Core\DynamicDescriptorHeap.cpp" />
-    <ClCompile Include="Core\GPUBuffer.cpp" />
-    <ClCompile Include="Core\Graphics.cpp" />
-    <ClCompile Include="Core\GPUResource.cpp" />
-    <ClCompile Include="Core\IndexBuffer.cpp" />
-    <ClCompile Include="Core\RenderTarget.cpp" />
-    <ClCompile Include="Core\ResourceStateTracker.cpp" />
-    <ClCompile Include="Core\RootSignature.cpp" />
-    <ClCompile Include="Core\StructuredBuffer.cpp" />
-    <ClCompile Include="Core\Texture.cpp" />
-    <ClCompile Include="Core\UploadBuffer.cpp" />
-    <ClCompile Include="Core\VertexBuffer.cpp" />
     <ClCompile Include="DX12\ColorBuffer.cpp" />
     <ClCompile Include="DX12\CommandList.cpp" />
     <ClCompile Include="DX12\CommandQueue.cpp" />
@@ -151,30 +132,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Core\ByteAddressBuffer.h" />
-    <ClInclude Include="Core\CommandAllocatorPool.h" />
-    <ClInclude Include="Core\CommandList.h" />
-    <ClInclude Include="Core\CommandListManager.h" />
-    <ClInclude Include="Core\ConstantBuffer.h" />
-    <ClInclude Include="Core\Defines.h" />
-    <ClInclude Include="Core\DescriptorAllocation.h" />
-    <ClInclude Include="Core\DescriptorAllocator.h" />
-    <ClInclude Include="Core\DescriptorAllocatorPage.h" />
-    <ClInclude Include="Core\DynamicDescriptorHeap.h" />
-    <ClInclude Include="Core\GPUBuffer.h" />
-    <ClInclude Include="Core\Graphics.h" />
-    <ClInclude Include="Core\GPUResource.h" />
-    <ClInclude Include="Core\IndexBuffer.h" />
-    <ClInclude Include="Core\RenderTarget.h" />
-    <ClInclude Include="Core\ResourceStateTracker.h" />
-    <ClInclude Include="Core\RootSignature.h" />
-    <ClInclude Include="Core\StructuredBuffer.h" />
-    <ClInclude Include="Core\Texture.h" />
-    <ClInclude Include="Core\TextureUsage.h" />
-    <ClInclude Include="Core\ThreadSafeQueue.h" />
-    <ClInclude Include="Core\UploadBuffer.h" />
-    <ClInclude Include="Core\Utility.h" />
-    <ClInclude Include="Core\VertexBuffer.h" />
     <ClInclude Include="DX12\ColorBuffer.h" />
     <ClInclude Include="DX12\CommandList.h" />
     <ClInclude Include="DX12\CommandQueue.h" />
@@ -208,6 +165,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Material.h" />
     <ClInclude Include="Math\MathUtils.h" />
     <ClInclude Include="MeshResource.h" />
+    <ClInclude Include="Model\Mesh.h" />
+    <ClInclude Include="Model\Model.h" />
+    <ClInclude Include="Model\ModelRenderer.h" />
     <ClInclude Include="ObjFile.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PostEffect.h" />
@@ -215,7 +175,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Core\Utilitycpp" />
     <None Include="Object3D.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
@@ -270,6 +229,42 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <None Include="Test.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ModelVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ModelPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShadowVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ShadowPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
