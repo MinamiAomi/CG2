@@ -246,5 +246,8 @@
     <None Include="HalfLambertLighting.PS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
+    <None Include="TestGS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

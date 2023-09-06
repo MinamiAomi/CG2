@@ -32,11 +32,11 @@ namespace CG {
         auto barrier = swapChain_.GetCurrentResource().TransitionBarrier(DX12::Resource::State::RenderTarget);
         cmdList->ResourceBarrier(1, &barrier);
 
-        auto rtv = swapChain_.GetCorrentRenderTargetView().GetDescriptor().GetCPUHandle();
+        //auto rtv = swapChain_.GetCorrentRenderTargetView().GetDescriptor().GetCPUHandle();
         auto dsv = depthStencilResource.GetCPUHandle();
-        cmdList->OMSetRenderTargets(1, &rtv, 0, &dsv);
-        float clearColor[4] = { 0.1f,0.3f,0.5f,1.0f };
-        cmdList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+        cmdList->OMSetRenderTargets(0, nullptr, 0, &dsv);
+        //float clearColor[4] = { 0.1f,0.3f,0.5f,1.0f };
+        //cmdList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
         cmdList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
         cmdList->RSSetViewports(1, &viewport_);

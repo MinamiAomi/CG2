@@ -37,6 +37,7 @@ namespace CG {
 
 
         DX12::Shader vs = shaderCompiler.Compile("Object3d.VS.hlsl", L"vs_6_0");
+        DX12::Shader gs = shaderCompiler.Compile("TestGS.hlsl", L"gs_6_0");
         DX12::Shader ps[kLightingCount]{
             shaderCompiler.Compile("NoneLighting.PS.hlsl", L"ps_6_0"),
             shaderCompiler.Compile("LambertLighting.PS.hlsl", L"ps_6_0"),
@@ -48,13 +49,14 @@ namespace CG {
             psDesc.Clear();
             psDesc.SetRootSignature(rootSignature_);
             psDesc.SetVertexShader(vs);
-            psDesc.SetPixelShader(ps[i]);
+            psDesc.SetGeometryShader(gs);
+            //psDesc.SetPixelShader(ps[i]);
             psDesc.AddInputElementVertex("POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
             psDesc.AddInputElementVertex("TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0);
             psDesc.AddInputElementVertex("NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0);
             psDesc.SetPrimitiveTopologyType(CG::DX12::PrimitiveTopology::Triangle);
             psDesc.SetRasterizerState(CG::DX12::CullMode::Back, CG::DX12::FillMode::Solid);
-            psDesc.AddRenderTargetState(CG::DX12::BlendMode::Normal, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+            //psDesc.AddRenderTargetState(CG::DX12::BlendMode::Normal, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
             psDesc.SetDepthState(DXGI_FORMAT_D24_UNORM_S8_UINT);
             psDesc.SetSampleState();
             pipelineStates_[i].Initialize(graphicsEngine->GetDevice(), psDesc);

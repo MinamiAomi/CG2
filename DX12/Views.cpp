@@ -246,7 +246,8 @@ namespace CG::DX12 {
 
         D3D12_DEPTH_STENCIL_VIEW_DESC desc{};
         desc.Format = resourceDesc.Format;
-        desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+        desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+        desc.Texture2DArray.ArraySize = 2;
         device.GetDevice()->CreateDepthStencilView(resource.GetResource().Get(), &desc, descriptor.GetCPUHandle());
 
         descriptor_ = descriptor;

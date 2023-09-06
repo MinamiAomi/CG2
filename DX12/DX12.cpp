@@ -19,7 +19,7 @@ namespace CG::DX12 {
     }
 
     void DepthStencilResource::Initialize(const Device& device, DescriptorHeap& descriptorHeap, uint32_t width, uint32_t height) {
-        resource_.InitializeForTexture2D(device, width, height, 1, 1, DXGI_FORMAT_D24_UNORM_S8_UINT, Resource::State::DepthWrite, Resource::HeapType::Default, Resource::Flag::AllowDepthStencil);
+        resource_.InitializeForTexture2D(device, width, height, 2, 1, DXGI_FORMAT_D24_UNORM_S8_UINT, Resource::State::DepthWrite, Resource::HeapType::Default, Resource::Flag::AllowDepthStencil);
         view_.Initialize(device, resource_, descriptorHeap.Allocate());
     }
 
